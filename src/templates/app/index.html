@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <title>Perten Time</title>
+    </head>
+
+    <body>
+        <h1>Project time report</h1>
+		<p>Hello {{ user.username }}</p>
+		<table>
+        	<thead>
+        		<tr>
+        			<th>Project</th>
+        			<!-- ko foreach: projects()[0].timeentries -->
+        			<th data-bind="text: date"></th>
+        			<!-- /ko -->
+        		</tr>
+        	</thead>
+        	<tbody data-bind="foreach: projects">
+	        	<tr>
+	        		<td data-bind="text: name"></td>
+	        		<!-- ko foreach: $data.timeentries -->
+        			<td><input data-bind="value: hours"></td>
+        			<!-- /ko -->
+	        	</tr>
+        	<tbody>
+        </table>
+		<p><a href="/logout">Logout</a></p>
+        <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
+    </body>
+
+	<script src="{% static "js/jquery-2.1.3.js" %}"></script>
+	<script src="{% static "js/jquery.cookie.js" %}"></script>
+	<script src="{% static "js/knockout-3.2.0.js" %}"></script>
+	<script src="{% static "js/app.setup.js" %}"></script>
+	
+	<script src="{% static "js/app.RegistrationVm.js" %}"></script>
+	<script src="{% static "js/app.index.js" %}"></script>
+</html>

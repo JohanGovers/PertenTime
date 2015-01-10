@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+    <head>
+        <title>Perten Time - Report</title>
+    </head>
+
+    <body>
+        <h1>Report</h1>
+        <table>
+        	<thead>
+        		<tr>
+        			<th>Project</th>
+        			<th>Hours</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		{% for project in projects %}
+	        	<tr>
+	        		<td>{{ project.name }}</td>
+	        		<td>{{ project.total_hours }}</td>
+	        	</tr>
+	        	{% endfor %}
+        	<tbody>
+        </table>
+        <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
+    </body>
+</html>
