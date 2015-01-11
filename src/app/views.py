@@ -4,7 +4,7 @@ from django.db.models import Prefetch, Sum
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from app.models import Project, TimeEntry
+from app.models import Project, TimeEntry, UserProfile
 from app.forms import UserForm, UserProfileForm
 
 #TODO: Split into multiple files. Multiple apps even?
@@ -22,8 +22,9 @@ def report(request):
 
 @login_required
 def get_time_entries(request):
-    # TODO: Prefetch does not work here. It spams the db with queries.
-    projects = Project.objects.order_by('name').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date')))
+    user_profile = UserProfile.objects.get(user=request.user)
+    # TODO: Prefetch does not work here. It spams the db with queries. 
+    projects = Project.objects.order_by('name').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
 
     start_date = datetime.datetime.strptime(request.GET['startDate'], "%Y-%m-%d")
     end_date = datetime.datetime.strptime(request.GET['endDate'], "%Y-%m-%d")
@@ -37,7 +38,8 @@ def get_time_entries(request):
              'timeentries': []}
     
         while current_date <= end_date:
-            entry = project.timeentry_set.filter(date=current_date).first()
+            # TODO: This is where the excess queries happen
+            entry = project.timeentry_set.filter(date=current_date, user_profile=user_profile).first()
             
             p['timeentries'].append({'date': current_date.strftime('%Y-%m-%d'),
                                       'hours': entry.hours if entry else None})
