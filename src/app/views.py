@@ -55,12 +55,13 @@ def get_time_entries(request):
 @login_required
 def create_time_post(request):
     if request.method == 'POST':
+        user_profile = UserProfile.objects.get(user=request.user)
         project_id = request.POST.get('projectId')
         project = Project.objects.get(id=project_id)
         date = request.POST.get('date')
         hours = request.POST.get('hours')
         
-        entry, created = TimeEntry.objects.get_or_create(project=project, date=date)
+        entry, created = TimeEntry.objects.get_or_create(project=project, date=date, user_profile=user_profile)
         entry.hours = hours
         entry.save()
         
