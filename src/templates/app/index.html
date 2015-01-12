@@ -29,7 +29,7 @@
 	        	<tr>
 	        		<td data-bind="text: name"></td>
 	        		<!-- ko foreach: $data.timeentries -->
-        			<td><input data-bind="value: hours, disable: submitted"></td>
+        			<td><input data-bind="value: hours, disable: submitted() || $root.dataLoadingInProgress()"></td>
         			<!-- /ko -->
 	        	</tr>
         	<tbody>
