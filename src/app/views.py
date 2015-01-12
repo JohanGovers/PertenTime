@@ -27,10 +27,10 @@ def get_time_entries(request):
     projects = Project.objects.order_by('name').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
 
     date_parse_string = "%Y-%m-%d"
-    start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string)
-    end_date = datetime.datetime.strptime(request.GET['endDate'], date_parse_string)
+    start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string).date()
+    end_date = datetime.datetime.strptime(request.GET['endDate'], date_parse_string).date()
     
-    response_data = []
+    response_data = {'projects': [], 'submittedUntil': user_profile.submitted_until.strftime('%Y-%m-%d')}
     
     for project in projects:
         current_date = start_date
@@ -41,20 +41,20 @@ def get_time_entries(request):
         while current_date <= end_date:
             # TODO: This is where the excess queries happen
             entry = project.timeentry_set.filter(date=current_date, user_profile=user_profile).first()
-            
             p['timeentries'].append({'date': current_date.strftime('%Y-%m-%d'),
-                                      'hours': entry.hours if entry else None})
+                                      'hours': entry.hours if entry else None,
+                                      'submitted': current_date <= user_profile.submitted_until})
             
             current_date += datetime.timedelta(days=1)
             
-        response_data.append(p)
+        response_data['projects'].append(p)
 
     return HttpResponse(
                         json.dumps(response_data),
                         content_type="application/json")
 
 @login_required
-def create_time_post(request):
+def save_time_entry(request):
     if request.method == 'POST':
         user_profile = UserProfile.objects.get(user=request.user)
         project_id = request.POST.get('projectId')
@@ -73,11 +73,17 @@ def create_time_post(request):
             json.dumps(response_data),
             content_type="application/json"
         )
-    else:
-        return HttpResponse(
-            json.dumps({"nothing to see": "this isn't happening"}),
-            content_type="application/json"
-        )
+
+@login_required        
+def set_last_submitted(request):
+    if request.method == 'POST':
+        new_date = request.POST.get('date')
+        
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile.submitted_until = new_date
+        user_profile.save()
+        
+        return HttpResponse('Last submetted set to ' + new_date)
         
 def register(request):
     registered = False

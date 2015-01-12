@@ -9,10 +9,10 @@
 
     <body>
         <h1>Project time report</h1>
-		<p>Hello {{ user.username }}</p>
+		<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
 		<p>
-			<button type="button" data-bind="click: loadPreviousWeek"><< Previous week</button>
-			<button type="button" data-bind="click: loadNextWeek">Next week >></button>
+			<button type="button" data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><< Previous week</button>
+			<button type="button" data-bind="click: loadNextWeek, enable: allSubmitted() && !dataLoadingInProgress()">Next week >></button>
 		</p>
 		<table>
         	<thead>
@@ -29,12 +29,12 @@
 	        	<tr>
 	        		<td data-bind="text: name"></td>
 	        		<!-- ko foreach: $data.timeentries -->
-        			<td><input data-bind="value: hours"></td>
+        			<td><input data-bind="value: hours, disable: submitted"></td>
         			<!-- /ko -->
 	        	</tr>
         	<tbody>
         </table>
-		<p><a href="/logout">Logout</a></p>
+        <p><button type="button" data-bind="click: submitUntilCurrentWeek, disable: dataLoadingInProgress">Submit</button></p>
         <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
     </body>
 

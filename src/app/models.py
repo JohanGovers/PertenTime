@@ -19,6 +19,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     
     department = models.ForeignKey(Department)
+    submitted_until = models.DateField()
     
     def __unicode__(self):
         return self.user.username

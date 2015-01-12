@@ -4,7 +4,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'PertenTime.settings')
 import django
 django.setup()
 
-from datetime import date
+from datetime import datetime, date
 from django.contrib.auth.models import User
 from app.models import Project, Department, UserProfile, TimeEntry
 
@@ -19,11 +19,11 @@ def populate():
     add_department('7', 'Electronics')
     force_users_department = add_department('7', 'Force users')
     
-    johan = add_user('jgovers', 'asdfasdf', 'Johan', 'Govers', 'johan@mail.com', software_department)
-    jane = add_user('jdoe', 'asdfasdf', 'Jane', 'Doe', 'jane@mail.com', software_department)
+    johan = add_user('jgovers', 'asdfasdf', 'Johan', 'Govers', 'johan@mail.com', software_department, date(2015, 1, 18))
+    jane = add_user('jdoe', 'asdfasdf', 'Jane', 'Doe', 'jane@mail.com', software_department, date(2015, 1, 18))
     
-    yoda = add_user('myoda', 'asdfasdf', 'Master', 'Yoda', 'yoda@mail.com', force_users_department)
-    luke = add_user('lskywalker', 'asdfasdf', 'Luke', 'Skywalker', 'luke@mail.com', force_users_department)
+    yoda = add_user('myoda', 'asdfasdf', 'Master', 'Yoda', 'yoda@mail.com', force_users_department, date(2015, 1, 11))
+    luke = add_user('lskywalker', 'asdfasdf', 'Luke', 'Skywalker', 'luke@mail.com', force_users_department, date(2015, 1, 11))
 
     add_time_entry(support, johan, date(2015, 1, 2), 8)
     
@@ -96,7 +96,7 @@ def add_department(code, name):
     d = Department.objects.get_or_create(code=code, name=name)[0]
     return d
 
-def add_user(username, password, first_name, last_name, email, department):
+def add_user(username, password, first_name, last_name, email, department, submitted_until):
     try:
         u = User.objects.get_by_natural_key(username)
     except User.DoesNotExist:
@@ -110,7 +110,12 @@ def add_user(username, password, first_name, last_name, email, department):
     u.last_name = last_name
     u.save()
 
-    up = UserProfile.objects.get_or_create(user=u, department=department)[0]
+    print "   - Save user profile for " + username
+    up = UserProfile.objects.get_or_create(user=u)[0]
+    up.department = department
+    up.submitted_until = submitted_until
+    up.save()
+    
     return up
 
 def add_time_entry(project, user_profile, date, hours):

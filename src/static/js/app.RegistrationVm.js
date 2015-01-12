@@ -1,14 +1,15 @@
-function TimeEntry(projectId, date, hours) {
+function TimeEntry(projectId, date, hours, submitted) {
 	var self = this;
 	
 	self.projectId = projectId;
 	self.date = date;
 	self.hours = ko.observable(hours);
+	self.submitted = ko.observable(submitted);
 	
 	self.hours.subscribe(function(newValue){
 		$.ajax({
 			type: 'POST',
-			url: 'create_time_post',
+			url: 'save_time_entry',
 			data: { projectId: self.projectId, date: self.date, hours: self.hours() },
 			})
 			//.done(function(data){
@@ -28,24 +29,35 @@ function Project(id, name, timeentries) {
 	self.name = name;
 	
 	self.timeentries = ko.observableArray(timeentries.map(function(entry){
-		return new TimeEntry(id, entry.date, entry.hours);
+		return new TimeEntry(id, entry.date, entry.hours, entry.submitted);
 	}));
 }
 
 function RegistrationVm() {
 	var self = this;
 	
+	self.dataLoadingInProgress = ko.observable(false);
+	
 	self.startDate = moment().startOf('isoWeek');
-	self.endDate = moment().endOf('isoWeek');
+	self.endDate = moment().endOf('isoWeek').hours(0).minutes(0).seconds(0).milliseconds(0);
 	self.projects = ko.observableArray();
 	
+	self.allSubmitted = ko.observable(false);
+	
+	
 	self.loadData = function(){
-		$.get('get_time_entries', { startDate: self.startDate.format("YYYY-MM-DD"), endDate: self.endDate.format("YYYY-MM-DD") }, function(projects){
-			self.projects.removeAll();
-			for (var i = 0; i < projects.length; i++) {
-				self.projects.push(new Project(projects[i].id, projects[i].name, projects[i].timeentries));
-			}
-		});
+		if(!self.dataLoadingInProgress()) {
+			self.dataLoadingInProgress(true);
+			$.get('get_time_entries', { startDate: self.startDate.format("YYYY-MM-DD"), endDate: self.endDate.format("YYYY-MM-DD") }, function(data){
+				self.projects.removeAll();
+				self.allSubmitted(self.endDate <= moment(data.submittedUntil));
+				for (var i = 0; i < data.projects.length; i++) {
+					self.projects.push(new Project(data.projects[i].id, data.projects[i].name, data.projects[i].timeentries));
+				}
+				
+				self.dataLoadingInProgress(false);
+			});
+		}
 	}
 	
 	self.loadNextWeek = function () {
@@ -60,5 +72,20 @@ function RegistrationVm() {
 		self.endDate = self.endDate.subtract(7, 'days');
 		
 		self.loadData();
+	}
+	
+	self.submitUntilCurrentWeek = function () {
+		$.ajax({
+			type: 'POST',
+			url: 'set_last_submitted',
+			data: { date: self.endDate.format("YYYY-MM-DD") },
+			})
+			.done(function(data){
+				console.log(data);
+			})
+			.fail(function(req, status, error){
+				// TODO: Show some error message in the UI.
+				console.error(status, error, "Something went wrong when submitting.", self);
+			});
 	}
 }
