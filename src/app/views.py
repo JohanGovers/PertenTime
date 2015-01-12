@@ -26,8 +26,9 @@ def get_time_entries(request):
     # TODO: Prefetch does not work here. It spams the db with queries. 
     projects = Project.objects.order_by('name').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
 
-    start_date = datetime.datetime.strptime(request.GET['startDate'], "%Y-%m-%d")
-    end_date = datetime.datetime.strptime(request.GET['endDate'], "%Y-%m-%d")
+    date_parse_string = "%Y-%m-%d"
+    start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string)
+    end_date = datetime.datetime.strptime(request.GET['endDate'], date_parse_string)
     
     response_data = []
     

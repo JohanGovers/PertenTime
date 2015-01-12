@@ -10,12 +10,18 @@
     <body>
         <h1>Project time report</h1>
 		<p>Hello {{ user.username }}</p>
+		<p>
+			<button type="button" data-bind="click: loadPreviousWeek"><< Previous week</button>
+			<button type="button" data-bind="click: loadNextWeek">Next week >></button>
+		</p>
 		<table>
         	<thead>
         		<tr>
         			<th>Project</th>
+        			<!-- ko if: projects()[0] -->
         			<!-- ko foreach: projects()[0].timeentries -->
         			<th data-bind="text: date"></th>
+        			<!-- /ko -->
         			<!-- /ko -->
         		</tr>
         	</thead>
@@ -32,6 +38,8 @@
         <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
     </body>
 
+	
+	<script src="{% static "js/moment.js" %}"></script>
 	<script src="{% static "js/jquery-2.1.3.js" %}"></script>
 	<script src="{% static "js/jquery.cookie.js" %}"></script>
 	<script src="{% static "js/knockout-3.2.0.js" %}"></script>

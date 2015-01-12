@@ -35,5 +35,30 @@ function Project(id, name, timeentries) {
 function RegistrationVm() {
 	var self = this;
 	
+	self.startDate = moment().startOf('isoWeek');
+	self.endDate = moment().endOf('isoWeek');
 	self.projects = ko.observableArray();
+	
+	self.loadData = function(){
+		$.get('get_time_entries', { startDate: self.startDate.format("YYYY-MM-DD"), endDate: self.endDate.format("YYYY-MM-DD") }, function(projects){
+			self.projects.removeAll();
+			for (var i = 0; i < projects.length; i++) {
+				self.projects.push(new Project(projects[i].id, projects[i].name, projects[i].timeentries));
+			}
+		});
+	}
+	
+	self.loadNextWeek = function () {
+		self.startDate = self.startDate.add(7, 'days');
+		self.endDate = self.endDate.add(7, 'days');
+		
+		self.loadData();
+	}
+	
+	self.loadPreviousWeek = function () {
+		self.startDate = self.startDate.subtract(7, 'days');
+		self.endDate = self.endDate.subtract(7, 'days');
+		
+		self.loadData();
+	}
 }
