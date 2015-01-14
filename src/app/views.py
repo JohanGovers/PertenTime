@@ -1,6 +1,6 @@
 import datetime, json
 from django.shortcuts import render
-from django.db.models import Prefetch, Sum
+from django.db.models import Prefetch, Sum, F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -15,9 +15,28 @@ def index(request):
 
 @login_required
 def report(request):
-    projects = Project.objects.order_by('name').annotate(total_hours=Sum('timeentry__hours'))
+    projects = Project.objects.order_by('name')
     
-    context_dict = {'projects': projects}
+    user_data = TimeEntry.objects.filter(user_profile__submitted_until__gte=F('date'))
+    user_data = user_data.values('project__name', 'user_profile__user__username', 'user_profile__submitted_until')
+    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__name')
+    
+    context_dict = {'data': [], 'projects': projects}
+    
+    # TODO: Tests for this method! E.g. it does not pad at the end and the first row is potentially duplicated!!
+    current_user = ''
+    for data_entry in user_data:
+        if data_entry['user_profile__user__username'] != current_user:
+            user_project_hours = []
+            current_user = data_entry['user_profile__user__username']
+            context_dict['data'].append({'username': data_entry['user_profile__user__username'], 'submitted_until': data_entry['user_profile__submitted_until'], 'project_hours': user_project_hours})
+        for project in projects:
+            if data_entry['project__name'] == project.name:
+                user_project_hours.append(data_entry['total_hours'])
+                break
+            else:
+                user_project_hours.append('')
+    
     return render(request, 'app/report.html', context_dict)
 
 @login_required

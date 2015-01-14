@@ -12,15 +12,21 @@
         <table>
         	<thead>
         		<tr>
-        			<th>Project</th>
-        			<th>Hours</th>
+        			<th>User</th>
+        			<th>Submitted until</th>
+        			{% for project in projects %}
+        			<th>{{ project.name }}</th>
+        			{% endfor %}
         		</tr>
         	</thead>
         	<tbody>
-        		{% for project in projects %}
+        		{% for row in data %}
 	        	<tr>
-	        		<td>{{ project.name }}</td>
-	        		<td>{{ project.total_hours }}</td>
+	        		<td>{{ row.username }}</td>
+	        		<td>{{ row.submitted_until }}</td>
+	        		{% for hours in row.project_hours %}
+	        		<td>{{ hours }}</td>
+	        		{% endfor %}
 	        	</tr>
 	        	{% endfor %}
         	<tbody>
