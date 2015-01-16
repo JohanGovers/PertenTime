@@ -16,8 +16,8 @@ def populate():
     
     software_department = add_department('7', 'Software')
     add_department('8', 'Construction')
-    add_department('7', 'Electronics')
-    force_users_department = add_department('7', 'Force users')
+    add_department('9', 'Electronics')
+    force_users_department = add_department('2', 'Force users')
     
     johan = add_user('jgovers', 'asdfasdf', 'Johan', 'Govers', 'johan@mail.com', software_department, date(2015, 1, 18))
     jane = add_user('jdoe', 'asdfasdf', 'Jane', 'Doe', 'jane@mail.com', software_department, date(2015, 1, 18))
@@ -103,15 +103,18 @@ def add_user(username, password, first_name, last_name, email, department, submi
         print " - Add user " + username
         u = User.objects.create_user(username=username, email=email, password=password)
     
-    print "   - Set properties on " + username
+    print " - Set properties on " + username
     u.set_password(password)
     u.email = email
     u.first_name = first_name
     u.last_name = last_name
     u.save()
 
-    print "   - Save user profile for " + username
-    up = UserProfile.objects.get_or_create(user=u)[0]
+    print " - Save user profile for " + username
+    try:
+        up = UserProfile.objects.get(user=u)
+    except UserProfile.DoesNotExist:
+        up = UserProfile(user=u)
     up.department = department
     up.submitted_until = submitted_until
     up.save()
