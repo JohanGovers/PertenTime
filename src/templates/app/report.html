@@ -9,6 +9,7 @@
 
     <body>
         <h1>Report</h1>
+        {% if data %}
         <table>
         	<thead>
         		<tr>
@@ -31,6 +32,9 @@
 	        	{% endfor %}
         	<tbody>
         </table>
+        {% else %}
+        <h2>No data available</h2>
+        {% endif %}
         <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
     </body>
 </html>
