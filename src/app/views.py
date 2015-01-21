@@ -29,7 +29,9 @@ def report(request):
         if data_entry['user_profile__user__username'] != current_user:
             user_project_hours = []
             current_user = data_entry['user_profile__user__username']
-            context_dict['data'].append({'username': data_entry['user_profile__user__username'], 'submitted_until': data_entry['user_profile__submitted_until'], 'project_hours': user_project_hours})
+            context_dict['data'].append({'username': data_entry['user_profile__user__username'], 
+                                         'submitted_until': data_entry['user_profile__submitted_until'], 
+                                         'project_hours': user_project_hours})
         for project in projects:
             if data_entry['project__name'] == project.name:
                 user_project_hours.append(data_entry['total_hours'])

@@ -8,6 +8,8 @@ from datetime import datetime, date
 from django.contrib.auth.models import User
 from app.models import Project, Department, UserProfile, TimeEntry
 
+from app.model_helpers import add_department, add_project, add_time_entry, add_user
+
 def populate():
     support = add_project('Support')
     invisible_screen = add_project('Invisible screen')
@@ -85,46 +87,6 @@ def populate():
     add_time_entry(invisible_screen, luke, date(2015, 1, 14), 8)
     add_time_entry(invisible_screen, luke, date(2015, 1, 15), 8)
     add_time_entry(invisible_screen, luke, date(2015, 1, 16), 8)
-
-def add_project(name):
-    print " - Add project " + name
-    p = Project.objects.get_or_create(name=name)[0]
-    return p
-
-def add_department(code, name):
-    print " - Add department " + code + " - " + name
-    d = Department.objects.get_or_create(code=code, name=name)[0]
-    return d
-
-def add_user(username, password, first_name, last_name, email, department, submitted_until):
-    try:
-        u = User.objects.get_by_natural_key(username)
-    except User.DoesNotExist:
-        print " - Add user " + username
-        u = User.objects.create_user(username=username, email=email, password=password)
-    
-    print " - Set properties on " + username
-    u.set_password(password)
-    u.email = email
-    u.first_name = first_name
-    u.last_name = last_name
-    u.save()
-
-    print " - Save user profile for " + username
-    try:
-        up = UserProfile.objects.get(user=u)
-    except UserProfile.DoesNotExist:
-        up = UserProfile(user=u)
-    up.department = department
-    up.submitted_until = submitted_until
-    up.save()
-    
-    return up
-
-def add_time_entry(project, user_profile, date, hours):
-    print " - Add time entry " + str(project) + " - " + str(user_profile) + " " + str(date) + ": " + str(hours)
-    e = TimeEntry.objects.get_or_create(project=project, user_profile=user_profile, date=date, hours=hours)[0]
-    return e
 
 if __name__ == '__main__':
     print "Starting project population script..."
