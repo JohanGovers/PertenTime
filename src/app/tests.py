@@ -12,7 +12,13 @@ class ReportViewTests(TestCase):
         self.client = Client()
         self.user = User.objects.create_user('test_user', 'test@mail.com', 'password')
         self.client.login(username='test_user', password='password')
-        
+    
+    def assert_projects(self, responseProjects, projects):
+        for i, project in enumerate(projects):
+            self.assertEqual(responseProjects[i].name, project.name)
+        return
+    
+    
     def test_no_data_displays_helpful_message(self):
         """
         If no data exists display a helpful no data message.
@@ -42,10 +48,7 @@ class ReportViewTests(TestCase):
         expected_projects = [project_a, project_b, project_c]
         expected_data = [{'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [8, '', 8]}]
         
-        #TODO: refactor with a helper method
-        self.assertEqual(response.context['projects'][0].name, 'project a')
-        self.assertEqual(response.context['projects'][1].name, 'project b')
-        self.assertEqual(response.context['projects'][2].name, 'project c')
+        self.assert_projects(response.context['projects'], expected_projects)
         
         self.assertEqual(response.context['data'], expected_data)
         
@@ -54,3 +57,7 @@ class ReportViewTests(TestCase):
         
     def no_time_on_first_project(self):
         return
+    
+    def don_not_count_time_after_submitted_until(self):
+        return
+    
