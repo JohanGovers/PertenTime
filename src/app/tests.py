@@ -146,9 +146,9 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 2, 3]},
-                            {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 5, 6]},
-                            {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 8, 9]}]
+                            {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 1, 3]},
+                            {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 4, 6]},
+                            {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 7, 9]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         

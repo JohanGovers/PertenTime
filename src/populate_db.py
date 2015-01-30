@@ -18,7 +18,7 @@ def populate():
     
     software_department = add_department('7', 'Software')
     add_department('8', 'Construction')
-    add_department('9', 'Electronics')
+    electronicts_department = add_department('9', 'Electronics')
     force_users_department = add_department('2', 'Force users')
     
     johan = add_user('jgovers', 'asdfasdf', 'Johan', 'Govers', 'johan@mail.com', software_department, date(2015, 1, 18))
@@ -26,6 +26,8 @@ def populate():
     
     yoda = add_user('myoda', 'asdfasdf', 'Master', 'Yoda', 'yoda@mail.com', force_users_department, date(2015, 1, 11))
     luke = add_user('lskywalker', 'asdfasdf', 'Luke', 'Skywalker', 'luke@mail.com', force_users_department, date(2015, 1, 11))
+    
+    batman = add_user('batman', 'asdfasdf', 'Bat', 'Man', 'batman@gotham.com', electronicts_department, date(2015, 1, 1))
 
     add_time_entry(support, johan, date(2015, 1, 2), 8)
     
