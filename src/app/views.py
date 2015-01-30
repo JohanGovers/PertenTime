@@ -41,7 +41,7 @@ def report(request):
     user_data = user_data.values('project__name', 'user_profile__user__username', 'user_profile__submitted_until')
     user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__name')
 
-    users_with_no_data = ['TODO']
+    users_with_no_data = UserProfile.objects.annotate(num_timeentries=Count('timeentry')).filter(num_timeentries=0)
     
     # TODO: Filter on submitted_until without removing users with no time
     #user_data = UserProfile.objects.order_by('user__username')
