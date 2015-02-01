@@ -1,6 +1,6 @@
 import datetime, json
 from django.shortcuts import render
-from django.db.models import Prefetch, Sum, F
+from django.db.models import Prefetch, Sum, F, Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -41,7 +41,7 @@ def report(request):
     user_data = user_data.values('project__name', 'user_profile__user__username', 'user_profile__submitted_until')
     user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__name')
 
-    users_with_no_data = UserProfile.objects.annotate(num_timeentries=Count('timeentry')).filter(num_timeentries=0)
+    users_with_no_data = list(UserProfile.objects.annotate(num_timeentries=Count('timeentry')).filter(num_timeentries=0).order_by('user__username').values('user__username', 'submitted_until'))
     
     # TODO: Filter on submitted_until without removing users with no time
     #user_data = UserProfile.objects.order_by('user__username')
@@ -77,6 +77,19 @@ def report(request):
             user_project_hours = []
             latest_project_added = ''
             current_user = data_entry['user_profile__user__username']
+            
+            
+            if len(users_with_no_data) > 0:
+                while users_with_no_data[0]['user__username'] < current_user:
+                    print '   !! ' + users_with_no_data[0]['user__username'] + ' < ' + current_user
+                    context_dict['data'].append({'username': users_with_no_data[0]['user__username'], 
+                                         'submitted_until': users_with_no_data[0]['submitted_until'], 
+                                         'project_hours': ['' for i in range(len(projects))]})
+                    users_with_no_data.pop(0)
+                    if(len(users_with_no_data) == 0):
+                        print '   !! no more no data users'
+                        break
+            
             context_dict['data'].append({'username': data_entry['user_profile__user__username'], 
                                          'submitted_until': data_entry['user_profile__submitted_until'], 
                                          'project_hours': user_project_hours})
@@ -97,6 +110,13 @@ def report(request):
     while len(user_project_hours) < len(projects):
                     print '  padding old entry?'
                     user_project_hours.append('')        
+    
+    while len(users_with_no_data) > 0:
+        print '   !! ' + users_with_no_data[0]['user__username'] + ' < ' + current_user
+        context_dict['data'].append({'username': users_with_no_data[0]['user__username'], 
+                             'submitted_until': users_with_no_data[0]['submitted_until'], 
+                             'project_hours': ['' for i in range(len(projects))]})
+        users_with_no_data.pop(0)
     
     return render(request, 'app/report.html', context_dict)
 
