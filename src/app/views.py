@@ -15,24 +15,6 @@ from app.forms import UserForm, UserProfileForm
 def index(request):
     return render(request, 'app/index.html')
 
-
-[
-    {'user_profile__submitted_until': datetime.date(2015, 1, 18), 'total_hours': 55, 'project__name': u'DA 7250', 'user_profile__user__username': u'jdoe'},
-    {'user_profile__submitted_until': datetime.date(2015, 1, 18), 'total_hours': 78, 'project__name': u'DA 7250', 'user_profile__user__username': u'jgovers'},
-    {'user_profile__submitted_until': datetime.date(2015, 1, 18), 'total_hours': 10, 'project__name': u'Support', 'user_profile__user__username': u'jgovers'},
-    {'user_profile__submitted_until': datetime.date(2015, 1, 11), 'total_hours': 48, 'project__name': u'Invisible screen', 'user_profile__user__username': u'lskywalker'},
-    {'user_profile__submitted_until': datetime.date(2015, 1, 11), 'total_hours': 48, 'project__name': u'Invisible screen', 'user_profile__user__username': u'myoda'}
-]
-
-#[
-#    {'user__username': u'batman', 'timeentry__project__name': None, 'total_hours':None},
-#    {'user__username': u'jdoe', 'timeentry__project__name': u'DA 7250', 'total_hours': 55},
-#    {'user__username': u'jgovers', 'timeentry__project__name': u'DA 7250', 'total_hours': 78},
-#    {'user__username': u'jgovers', 'timeentry__project__name': u'Support', 'total_hours': 10},
-#    {'user__username': u'lskywalker', 'timeentry__project__name': u'Invisible screen', 'total_hours': 88},
-#    {'user__username': u'myoda', 'timeentry__project__name': u'Invisible screen', 'total_hours': 88}
-#]
-
 @login_required
 def report(request):
     projects = Project.objects.order_by('name')
@@ -43,51 +25,28 @@ def report(request):
 
     users_with_no_data = list(UserProfile.objects.annotate(num_timeentries=Count('timeentry')).filter(num_timeentries=0).order_by('user__username').values('user__username', 'submitted_until'))
     
-    # TODO: Filter on submitted_until without removing users with no time
-    #user_data = UserProfile.objects.order_by('user__username')
-    #user_data = user_data.prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.filter(user_profile__submitted_until__gte=F('date')).order_by('timeentry__project__name', 'date')))
-    #user_data = user_data.filter(submitted_until__gte=F('timeentry__date'))
-    #user_data = user_data.values('timeentry__project__name', 'user__username', 'submitted_until')
-    #user_data = user_data.annotate(total_hours=Sum('timeentry__hours'))
-    
     context_dict = {'data': [], 'projects': projects}
     
     current_user = ''
     user_project_hours = []
     latest_project_added = ''
     for data_entry in user_data:
-        print ''
-        print 'New data entry ' + str(data_entry)
-        print 'Current user: ' + str(current_user)
-        
-        # New user.
         if data_entry['user_profile__user__username'] != current_user:
-            
-            #if current_user < data_entry['user__username']:
-            #    print '  User not in entries list'
-            #    context_dict['data'].append({'username': data_entry['user__username'], 
-            #                                'submitted_until': data_entry['submitted_until'], 
-            #                                'project_hours': ['','','']})
-            
             if current_user != data_entry['user_profile__user__username'] and current_user != '':
                 while len(user_project_hours) < len(projects):
-                    print '  padding old entry?'
                     user_project_hours.append('')
                     
             user_project_hours = []
             latest_project_added = ''
             current_user = data_entry['user_profile__user__username']
             
-            
             if len(users_with_no_data) > 0:
                 while users_with_no_data[0]['user__username'] < current_user:
-                    print '   !! ' + users_with_no_data[0]['user__username'] + ' < ' + current_user
                     context_dict['data'].append({'username': users_with_no_data[0]['user__username'], 
                                          'submitted_until': users_with_no_data[0]['submitted_until'], 
                                          'project_hours': ['' for i in range(len(projects))]})
                     users_with_no_data.pop(0)
                     if(len(users_with_no_data) == 0):
-                        print '   !! no more no data users'
                         break
             
             context_dict['data'].append({'username': data_entry['user_profile__user__username'], 
@@ -95,24 +54,17 @@ def report(request):
                                          'project_hours': user_project_hours})
             
         for project in projects:
-            print '  Project ' + project.name
-            print '  Data entry project ' + str(data_entry['project__name'])
             if data_entry['project__name'] == project.name:
-                print '    Append time and break'
                 user_project_hours.append(data_entry['total_hours'])
                 latest_project_added = project.name
                 break
-            # if project comes before data_entry['project_name'] in alfabetic order it should be set to empty
             elif latest_project_added < project.name < data_entry['project__name']: 
-                print '    Append empty and continue'
                 user_project_hours.append('')
                 
     while len(user_project_hours) < len(projects):
-                    print '  padding old entry?'
                     user_project_hours.append('')        
     
     while len(users_with_no_data) > 0:
-        print '   !! ' + users_with_no_data[0]['user__username'] + ' < ' + current_user
         context_dict['data'].append({'username': users_with_no_data[0]['user__username'], 
                              'submitted_until': users_with_no_data[0]['submitted_until'], 
                              'project_hours': ['' for i in range(len(projects))]})
