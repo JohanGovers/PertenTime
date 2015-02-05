@@ -40,6 +40,7 @@ function RegistrationVm() {
 	
 	self.startDate = moment().startOf('isoWeek');
 	self.endDate = moment().endOf('isoWeek').hours(0).minutes(0).seconds(0).milliseconds(0);
+	self.submittedUntil = undefined;
 	self.projects = ko.observableArray();
 	
 	self.allSubmitted = ko.observable(false);
@@ -50,7 +51,8 @@ function RegistrationVm() {
 			self.dataLoadingInProgress(true);
 			$.get('get_time_entries', { startDate: self.startDate.format("YYYY-MM-DD"), endDate: self.endDate.format("YYYY-MM-DD") }, function(data){
 				self.projects.removeAll();
-				self.allSubmitted(self.endDate <= moment(data.submittedUntil));
+				self.submittedUntil = moment(data.submittedUntil);
+				self.allSubmitted(self.endDate <= self.submittedUntil);
 				for (var i = 0; i < data.projects.length; i++) {
 					self.projects.push(new Project(data.projects[i].id, data.projects[i].name, data.projects[i].timeentries));
 				}
@@ -75,10 +77,20 @@ function RegistrationVm() {
 	}
 	
 	self.submitUntilCurrentWeek = function () {
+		var submitEndDate;
+		if (self.startDate.month() != self.endDate.month()) {
+			if (self.submittedUntil.isBetween(self.startDate, self.endDate, 'day')) {
+				submitEndDate = self.endDate.format("YYYY-MM-DD");
+			} else {
+				submitEndDate = self.startDate.endOf('month').format("YYYY-MM-DD");
+			}
+		} else {
+			submitEndDate = self.endDate.format("YYYY-MM-DD");
+		}
 		$.ajax({
 			type: 'POST',
 			url: 'set_last_submitted',
-			data: { date: self.endDate.format("YYYY-MM-DD") },
+			data: { date: submitEndDate },
 			})
 			.done(function(data){
 				console.log(data);
