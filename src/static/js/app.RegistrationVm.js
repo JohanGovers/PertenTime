@@ -94,6 +94,7 @@ function RegistrationVm() {
 			})
 			.done(function(data){
 				console.log(data);
+				self.loadData();
 			})
 			.fail(function(req, status, error){
 				// TODO: Show some error message in the UI.
