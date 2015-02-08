@@ -1,4 +1,5 @@
 import datetime, json
+from datetime import timedelta
 from django.shortcuts import render
 from django.db.models import Prefetch, Sum, F, Count
 from django.http import HttpResponse, HttpResponseRedirect
@@ -79,10 +80,23 @@ def get_time_entries(request):
     projects = Project.objects.order_by('name').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
 
     date_parse_string = "%Y-%m-%d"
-    start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string).date()
-    end_date = datetime.datetime.strptime(request.GET['endDate'], date_parse_string).date()
+    if 'startDate' in request.GET:        
+        start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string).date()
+    else:
+        # sunday +1, monday +0, tuesday -1, wednesday -2, thursday -3, friday -4, saturday -5
+        weekday_nr = user_profile.submitted_until.isoweekday()
+        if weekday_nr == 7:
+            start_date = user_profile.submitted_until + timedelta(days=1)
+        else:
+            start_date = user_profile.submitted_until - timedelta(days=weekday_nr - 1)
+            
+    end_date = start_date + timedelta(days=6)
     
-    response_data = {'projects': [], 'submittedUntil': user_profile.submitted_until.strftime('%Y-%m-%d')}
+    response_data = {
+        'projects': [],
+        'submittedUntil': user_profile.submitted_until.strftime(date_parse_string),
+        'startDate': start_date.strftime(date_parse_string),
+        'endDate': end_date.strftime(date_parse_string)}
     
     for project in projects:
         current_date = start_date

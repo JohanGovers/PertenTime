@@ -38,8 +38,8 @@ function RegistrationVm() {
 	
 	self.dataLoadingInProgress = ko.observable(false);
 	
-	self.startDate = moment().startOf('isoWeek');
-	self.endDate = moment().endOf('isoWeek').hours(0).minutes(0).seconds(0).milliseconds(0);
+	self.startDate = undefined;
+	self.endDate = undefined;
 	self.submittedUntil = undefined;
 	self.projects = ko.observableArray();
 	
@@ -49,9 +49,15 @@ function RegistrationVm() {
 	self.loadData = function(){
 		if(!self.dataLoadingInProgress()) {
 			self.dataLoadingInProgress(true);
-			$.get('get_time_entries', { startDate: self.startDate.format("YYYY-MM-DD"), endDate: self.endDate.format("YYYY-MM-DD") }, function(data){
+			var requestData = {};
+			if (!!self.startDate) {
+				requestData = { startDate: self.startDate.format("YYYY-MM-DD") }
+			}
+			$.get('get_time_entries', requestData, function(data){
 				self.projects.removeAll();
 				self.submittedUntil = moment(data.submittedUntil);
+				self.startDate = moment(data.startDate);
+				self.endDate = moment(data.endDate);
 				self.allSubmitted(self.endDate <= self.submittedUntil);
 				for (var i = 0; i < data.projects.length; i++) {
 					self.projects.push(new Project(data.projects[i].id, data.projects[i].name, data.projects[i].timeentries));
@@ -93,7 +99,7 @@ function RegistrationVm() {
 			data: { date: submitEndDate },
 			})
 			.done(function(data){
-				console.log(data);
+				self.startDate = null;
 				self.loadData();
 			})
 			.fail(function(req, status, error){
