@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.db.models import Prefetch, Sum, F, Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from app.models import Project, TimeEntry, UserProfile
 from app.forms import UserForm, UserProfileForm
@@ -17,6 +17,7 @@ def index(request):
     return render(request, 'app/index.html')
 
 @login_required
+@user_passes_test(lambda u: u.is_superuser)
 def report(request):
     projects = Project.objects.order_by('name')
     
