@@ -10,7 +10,7 @@ from app.model_helpers import add_department, add_project, add_time_entry, add_u
 class ReportViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user('test_user', 'test@mail.com', 'password')
+        self.user = User.objects.create_superuser('test_user', 'test@mail.com', 'password')
         self.client.login(username='test_user', password='password')
     
     def assert_projects(self, responseProjects, projects):
