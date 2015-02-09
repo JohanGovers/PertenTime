@@ -20,10 +20,15 @@ def index(request):
 def report(request):
     projects = Project.objects.order_by('name')
     
-    base_date = datetime.datetime.now()
+    now = datetime.datetime.now()
+    now_day_count = calendar.monthrange(now.year, now.month)[1]
+    base_date = datetime.datetime.now() - timedelta(days=now_day_count)
+    base_date = base_date.replace(day=1) #there is always a first in every month
     if 'month' in request.GET:
         base_date = base_date.replace(month=int(request.GET['month']))
-
+    if 'year' in request.GET:
+        base_date = base_date.replace(year=int(request.GET['year']))
+    
     start_date = base_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     end_day = calendar.monthrange(base_date.year, base_date.month)[1]
     end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
@@ -36,7 +41,26 @@ def report(request):
                             .values('username', 'userprofile__submitted_until')
                             .order_by('username'))
     
-    context_dict = {'data': [], 'projects': projects}
+    if base_date.month == 12:
+        next_year = base_date.year + 1
+        next_month = 1
+        previous_year = base_date.year
+        previous_month = base_date.month - 1
+    elif base_date.month == 1:
+        next_year = base_date.year
+        next_month = base_date.month + 1
+        previous_year = base_date.year - 1
+        previous_month = 12
+    else:
+        next_year = base_date.year
+        next_month = base_date.month + 1
+        previous_year = base_date.year
+        previous_month = base_date.month - 1
+    
+    context_dict = {'data': [], 'projects': projects,
+        'year': base_date.year, 'month': base_date.month,
+        'query_for_previous': '?year={0}&month={1}'.format(previous_year, previous_month),
+        'query_for_next': '?year={0}&month={1}'.format(next_year, next_month)}
     
     current_user = ''
     user_project_hours = []

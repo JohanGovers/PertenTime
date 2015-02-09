@@ -13,7 +13,11 @@
     </head>
 
     <body>
-        <h1>Report</h1>
+        <h1>Report for {{year}}-{{month}}</h1>
+	<p>
+	    <a href="{{ query_for_previous }}"><< Previous month</a>
+	    <a href="{{ query_for_next }}">Next month >></a>
+	</p>
         <table>
         	<thead>
         		<tr>
