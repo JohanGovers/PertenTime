@@ -4,30 +4,26 @@ from django.core.urlresolvers import reverse
 
 from datetime import date
 
-from app.models import TimeEntry
+from app.models import TimeEntry, UserProfile
 from app.model_helpers import add_department, add_project, add_time_entry, add_user
 
 class ReportViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_superuser('test_user', 'test@mail.com', 'password')
-        self.client.login(username='test_user', password='password')
+        self.user = User.objects.create_superuser('__test_user', 'test@mail.com', 'password')
+        department = add_department('test', 'TS')
+        up = UserProfile(user=self.user)
+        up.department = department
+        up.submitted_until = date(2012,1,11)
+        up.save()
+        
+        self.client.login(username='__test_user', password='password')
     
     def assert_projects(self, responseProjects, projects):
         for i, project in enumerate(projects):
             self.assertEqual(responseProjects[i].name, project.name)
         return
-    
-    
-    def test_no_data_displays_helpful_message(self):
-        """
-        If no data exists display a helpful no data message.
-        """
-        response = self.client.get(reverse('app.views.report'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No data available")
-        self.assertEqual(len(response.context['data']), 0)
-        
+
     def test_only_middle_user_has_time(self):
         """
         Three projects, three users only middle user has time. All users should be in the list.
@@ -44,11 +40,12 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile_2, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_2, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('app.views.report'))
+        response = self.client.get(reverse('app.views.report'), {'month': 1})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
+                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
                             {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', '', '']},
                             {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]},
                             {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', '', '']}]
@@ -82,11 +79,12 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_3, date(2015, 1, 13), 8)
         add_time_entry(project_c, user_profile_3, date(2015, 1, 14), 9)
         
-        response = self.client.get(reverse('app.views.report'))
+        response = self.client.get(reverse('app.views.report'), {'month': 1})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
+                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
                             {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': [1, 2, 3]},
                             {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': [4, 5, 6]},
                             {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 8, 9]}]
@@ -109,11 +107,13 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('app.views.report'))
+        response = self.client.get(reverse('app.views.report'), {'month': 1})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
-        expected_data = [{'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]}]
+        expected_data = [
+                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -141,11 +141,12 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_3, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_3, date(2015, 1, 14), 9)
         
-        response = self.client.get(reverse('app.views.report'))
+        response = self.client.get(reverse('app.views.report'), {'month': 1})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
+                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
                             {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 1, 3]},
                             {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 4, 6]},
                             {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 7, 9]}]
@@ -176,11 +177,12 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile_3, date(2015, 1, 12), 7)
         add_time_entry(project_b, user_profile_3, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('app.views.report'))
+        response = self.client.get(reverse('app.views.report'), {'month': 1})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
+                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
                             {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': [1, 2, '']},
                             {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': [4, 5, '']},
                             {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 8, '']}]
@@ -205,13 +207,43 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile, date(2015, 1, 19), 1)
         add_time_entry(project_c, user_profile, date(2015, 1, 20), 8)
         
-        response = self.client.get(reverse('app.views.report'))
+        response = self.client.get(reverse('app.views.report'), {'month': 1})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
-        expected_data = [{'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 1, 8]}]
+        expected_data = [
+                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 1, 8]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
         self.assertEqual(response.context['data'], expected_data)
     
+    def test_only_count_time_for_specified_month(self):
+        project_a = add_project('project a')
+        project_b = add_project('project b')
+        
+        department = add_department('code', 'name')
+        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 5, 18))
+        user_profile_2 = add_user('user with entries in other month', 'password', 'first_name', 'last_name', 'email', department, date(2015, 5, 18))
+        user_profile_3 = add_user('user with no entries', 'password', 'first_name', 'last_name', 'email', department, date(2015, 5, 18))
+        
+        add_time_entry(project_a, user_profile_1, date(2015, 2, 12), 6)
+        add_time_entry(project_a, user_profile_1, date(2015, 3, 2), 7)
+        add_time_entry(project_a, user_profile_1, date(2015, 4, 2), 8)
+        
+        add_time_entry(project_b, user_profile_2, date(2015, 4, 4), 5)
+        
+        response = self.client.get(reverse('app.views.report'), {'month': 3})
+        self.assertEqual(response.status_code, 200)
+        
+        expected_projects = [project_a, project_b]
+        expected_data = [
+            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '']},
+            {'username': u'user with entries in other month', 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '']},
+            {'username': u'user with no entries', 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '']},
+            {'username': u'username1', 'submitted_until': date(2015, 5, 18), 'project_hours': [7, '']}]
+        
+        self.assert_projects(response.context['projects'], expected_projects)
+        
+        self.assertEqual(response.context['data'], expected_data)

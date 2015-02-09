@@ -1,4 +1,4 @@
-import datetime, json
+import datetime, json, calendar
 from datetime import timedelta
 from django.shortcuts import render
 from django.db.models import Prefetch, Sum, F, Count
@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from app.models import Project, TimeEntry, UserProfile
 from app.forms import UserForm, UserProfileForm
-
 
 #TODO: Split into multiple files. Multiple apps even?
 
@@ -21,11 +20,21 @@ def index(request):
 def report(request):
     projects = Project.objects.order_by('name')
     
-    user_data = TimeEntry.objects.filter(user_profile__submitted_until__gte=F('date'))
+    base_date = datetime.datetime.now()
+    if 'month' in request.GET:
+        base_date = base_date.replace(month=int(request.GET['month']))
+
+    start_date = base_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    end_day = calendar.monthrange(base_date.year, base_date.month)[1]
+    end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
+    
+    user_data = TimeEntry.objects.filter(user_profile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
     user_data = user_data.values('project__name', 'user_profile__user__username', 'user_profile__submitted_until')
     user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__name')
 
-    users_with_no_data = list(UserProfile.objects.annotate(num_timeentries=Count('timeentry')).filter(num_timeentries=0).order_by('user__username').values('user__username', 'submitted_until'))
+    users_with_no_data = list(User.objects.exclude(username__in=user_data.values('user_profile__user__username'))
+                            .values('username', 'userprofile__submitted_until')
+                            .order_by('username'))
     
     context_dict = {'data': [], 'projects': projects}
     
@@ -43,9 +52,9 @@ def report(request):
             current_user = data_entry['user_profile__user__username']
             
             if len(users_with_no_data) > 0:
-                while users_with_no_data[0]['user__username'] < current_user:
-                    context_dict['data'].append({'username': users_with_no_data[0]['user__username'], 
-                                         'submitted_until': users_with_no_data[0]['submitted_until'], 
+                while users_with_no_data[0]['username'] < current_user:
+                    context_dict['data'].append({'username': users_with_no_data[0]['username'], 
+                                         'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
                                          'project_hours': ['' for i in range(len(projects))]})
                     users_with_no_data.pop(0)
                     if(len(users_with_no_data) == 0):
@@ -67,8 +76,8 @@ def report(request):
                     user_project_hours.append('')        
     
     while len(users_with_no_data) > 0:
-        context_dict['data'].append({'username': users_with_no_data[0]['user__username'], 
-                             'submitted_until': users_with_no_data[0]['submitted_until'], 
+        context_dict['data'].append({'username': users_with_no_data[0]['username'], 
+                             'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
                              'project_hours': ['' for i in range(len(projects))]})
         users_with_no_data.pop(0)
     
