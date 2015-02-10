@@ -3,6 +3,7 @@ from app import views
 
 urlpatterns = patterns('',
         url(r'^$', views.index, name='index'),
+        url(r'^about/$', views.about, name='about'),
         url(r'^get_time_entries$', views.get_time_entries, name='get_time_entries'),
         url(r'^save_time_entry$', views.save_time_entry, name='save_time_entry'),
         url(r'^set_last_submitted$', views.set_last_submitted, name='set_last_submitted'),
