@@ -166,11 +166,11 @@ def save_time_entry(request):
         hours = request.POST.get('hours')
         
         entry, created = TimeEntry.objects.get_or_create(project=project, date=date, user_profile=user_profile)
-        entry.hours = hours
+        entry.hours = hours if hours != '' else 0
         entry.save()
         
         response_data = {}
-        response_data['msg'] = 'Added new entry' if created else 'Updated existing entry'
+        response_data['msg'] = 'Added new entry with hours set to ' + str(hours) if created else 'Updated existing entry to ' + str(hours)
         
         return HttpResponse(
             json.dumps(response_data),

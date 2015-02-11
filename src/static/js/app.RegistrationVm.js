@@ -3,10 +3,10 @@ function TimeEntry(projectId, date, hours, submitted) {
 	
 	self.projectId = projectId;
 	self.date = date;
-	self.hours = ko.observable(hours);
+	self.hours = ko.observable(hours).extend({ rateLimit: { timeout: 400, method: "notifyWhenChangesStop" } });
 	self.submitted = ko.observable(submitted);
 	
-	self.hours.subscribe(function(newValue){
+	self.hours.subscribe(function(){
 		$.ajax({
 			type: 'POST',
 			url: 'save_time_entry',
