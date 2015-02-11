@@ -8,11 +8,19 @@ function TimeEntry(projectId, date, hours, submitted) {
 	
 	self.hours.subscribe(function(){
 		//Sanitize input of time.
-		//Replace , with .
-		self.hours(self.hours().replace(',', '.'));
-		//Allow only 2 decimals
+		var value = self.hours();
 		
+		self.hours(self.hours().replace(',', '.'));
+	
 		//No non numeric characters.
+		
+		
+		//Allow only 2 decimals
+		if ((value.split('.')[1] || []).length > 2){
+			value = Number(value).toFixed(2);
+		}
+		
+		self.hours(value);
 			
 		$.ajax({
 			type: 'POST',
