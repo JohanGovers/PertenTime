@@ -7,6 +7,13 @@ function TimeEntry(projectId, date, hours, submitted) {
 	self.submitted = ko.observable(submitted);
 	
 	self.hours.subscribe(function(){
+		//Sanitize input of time.
+		//Replace , with .
+		self.hours(self.hours().replace(',', '.'));
+		//Allow only 2 decimals
+		
+		//No non numeric characters.
+			
 		$.ajax({
 			type: 'POST',
 			url: 'save_time_entry',
@@ -18,7 +25,7 @@ function TimeEntry(projectId, date, hours, submitted) {
 			.fail(function(req, status, error){
 				// TODO: Show some error message in the UI.
 				console.error(status, error, "Something went wrong when saving.", self, "Hours: " + self.hours() );
-			});
+		});
 	});
 }
 
