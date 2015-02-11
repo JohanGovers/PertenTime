@@ -13,7 +13,14 @@ function TimeEntry(projectId, date, hours, submitted) {
 		self.hours(self.hours().replace(',', '.'));
 	
 		//No non numeric characters.
+		var value = value.replace(/[^\d.$]/g, '');
 		
+		//Only one decimal point
+		if ((value.match(/\./g) || []).length > 1) {
+			var idxFirstDot = value.indexOf('.');  
+			var idxSecondDot = value.indexOf('.', idxFirstDot + 1);
+			value = value.substring(0, idxSecondDot);
+		}
 		
 		//Allow only 2 decimals
 		if ((value.split('.')[1] || []).length > 2){
