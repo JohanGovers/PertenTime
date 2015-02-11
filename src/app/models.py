@@ -28,7 +28,7 @@ class UserProfile(models.Model):
 # TODO: Unique constraint on combination of user_profile, date and project
 class TimeEntry(models.Model):
     date = models.DateField()
-    hours = models.IntegerField(default=0)
+    hours = models.DecimalField(default=0, max_digits=4, decimal_places=2)
     project = models.ForeignKey(Project)
     user_profile = models.ForeignKey(UserProfile)
     
