@@ -11,10 +11,10 @@ from app.models import Project, Department, UserProfile, TimeEntry
 from app.model_helpers import add_department, add_project, add_time_entry, add_user
 
 def populate():
-    support = add_project('Support')
-    invisible_screen = add_project('Invisible screen')
-    DA_7250 = add_project('DA 7250')
-    add_project('Cooling')
+    support = add_project('X', 'Support')
+    invisible_screen = add_project('0', 'Invisible screen')
+    DA_7250 = add_project('725', 'DA 7250')
+    add_project('12', 'Cooling')
     
     software_department = add_department('7', 'Software')
     add_department('8', 'Construction')

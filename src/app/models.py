@@ -2,10 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Project(models.Model):
+    code = models.CharField(max_length=256, unique=True)
     name = models.CharField(max_length=256, unique=True)
     
     def __unicode__(self):
-        return self.name
+        return self.code + " - " + self.name
 
 class Department(models.Model):
     code = models.CharField(max_length=256, blank=False)

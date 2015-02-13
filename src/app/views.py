@@ -21,7 +21,7 @@ def about(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def report(request):
-    projects = Project.objects.order_by('name')
+    projects = Project.objects.order_by('code')
     
     now = datetime.datetime.now()
     now_day_count = calendar.monthrange(now.year, now.month)[1]
@@ -37,8 +37,8 @@ def report(request):
     end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
     
     user_data = TimeEntry.objects.filter(user_profile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
-    user_data = user_data.values('project__name', 'user_profile__user__username', 'user_profile__submitted_until')
-    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__name')
+    user_data = user_data.values('project__code', 'project__name', 'user_profile__user__username', 'user_profile__submitted_until')
+    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__code')
 
     users_with_no_data = list(User.objects.exclude(username__in=user_data.values('user_profile__user__username'))
                             .values('username', 'userprofile__submitted_until')
@@ -114,7 +114,7 @@ def report(request):
 def get_time_entries(request):
     user_profile = UserProfile.objects.get(user=request.user)
     # TODO: Prefetch does not work here. It spams the db with queries. 
-    projects = Project.objects.order_by('name').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
+    projects = Project.objects.order_by('code').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
 
     date_parse_string = "%Y-%m-%d"
     if 'startDate' in request.GET:        
@@ -138,6 +138,7 @@ def get_time_entries(request):
     for project in projects:
         current_date = start_date
         p = {'id': project.id,
+             'code': project.code,
              'name': project.name,
              'timeentries': []}
     

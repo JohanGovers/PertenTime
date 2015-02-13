@@ -27,7 +27,7 @@
         	</thead>
         	<tbody data-bind="foreach: projects">
 	        	<tr>
-	        		<td data-bind="text: name"></td>
+	        		<td data-bind="text: code + ' - ' + name"></td>
 	        		<!-- ko foreach: $data.timeentries -->
         			<td><input data-bind="value: hours, valueUpdate: 'keyup', disable: submitted() || $root.dataLoadingInProgress()"></td>
         			<!-- /ko -->

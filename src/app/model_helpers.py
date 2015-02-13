@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from app.models import Project, Department, UserProfile, TimeEntry
 
-def add_project(name):
-    print " - Add project " + name
-    p = Project.objects.get_or_create(name=name)[0]
+def add_project(code, name):
+    print " - Add project " + code + " - " + name
+    p = Project.objects.get_or_create(code=code, name=name)[0]
     return p
 
 def add_department(code, name):

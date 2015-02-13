@@ -44,10 +44,11 @@ function TimeEntry(projectId, date, hours, submitted) {
 	});
 }
 
-function Project(id, name, timeentries) {
+function Project(id, code, name, timeentries) {
 	var self = this;
 	
 	self.id = id;
+	self.code = code;
 	self.name = name;
 	
 	self.timeentries = ko.observableArray(timeentries.map(function(entry){
@@ -82,7 +83,7 @@ function RegistrationVm() {
 				self.endDate = moment(data.endDate);
 				self.allSubmitted(self.endDate <= self.submittedUntil);
 				for (var i = 0; i < data.projects.length; i++) {
-					self.projects.push(new Project(data.projects[i].id, data.projects[i].name, data.projects[i].timeentries));
+					self.projects.push(new Project(data.projects[i].id, data.projects[i].code, data.projects[i].name, data.projects[i].timeentries));
 				}
 				
 				self.dataLoadingInProgress(false);

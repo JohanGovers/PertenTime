@@ -28,9 +28,9 @@ class ReportViewTests(TestCase):
         """
         Three projects, three users only middle user has time. All users should be in the list.
         """
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        project_c = add_project('project c')
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+        project_c = add_project('c', 'project c')
         
         department = add_department('code', 'name')
         user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
@@ -58,9 +58,9 @@ class ReportViewTests(TestCase):
         """
         Three projects, three users all users has time on all projects. All users should be in the list.
         """
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        project_c = add_project('project c')
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+        project_c = add_project('c', 'project c')
         
         department = add_department('code', 'name')
         user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
@@ -97,9 +97,9 @@ class ReportViewTests(TestCase):
         """
         Three projects (A, B, C) and one user with time on A and C.
         """
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        project_c = add_project('project c')
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+        project_c = add_project('c', 'project c')
         
         department = add_department('code', 'name')
         user_profile = add_user('username', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
@@ -123,9 +123,9 @@ class ReportViewTests(TestCase):
         """
         Three users, three projects. No time reported on the first project.
         """
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        project_c = add_project('project c')
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+        project_c = add_project('c', 'project c')
         
         department = add_department('code', 'name')
         user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
@@ -159,9 +159,9 @@ class ReportViewTests(TestCase):
         """
         Three users, three projects. No time reported on the third project.
         """
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        project_c = add_project('project c')
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+        project_c = add_project('c', 'project c')
         
         department = add_department('code', 'name')
         user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
@@ -192,9 +192,9 @@ class ReportViewTests(TestCase):
         self.assertEqual(response.context['data'], expected_data)
     
     def test_don_not_count_time_after_submitted_until(self):
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        project_c = add_project('project c')
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+        project_c = add_project('c', 'project c')
         
         department = add_department('code', 'name')
         user_profile = add_user('username', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
@@ -220,9 +220,9 @@ class ReportViewTests(TestCase):
         self.assertEqual(response.context['data'], expected_data)
     
     def test_only_count_time_for_specified_month(self):
-        project_a = add_project('project a')
-        project_b = add_project('project b')
-        
+        project_a = add_project('a', 'project a')
+        project_b = add_project('b', 'project b')
+     
         department = add_department('code', 'name')
         user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 5, 18))
         user_profile_2 = add_user('user with entries in other month', 'password', 'first_name', 'last_name', 'email', department, date(2015, 5, 18))
