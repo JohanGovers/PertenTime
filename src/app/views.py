@@ -36,12 +36,12 @@ def report(request):
     end_day = calendar.monthrange(base_date.year, base_date.month)[1]
     end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
     
-    user_data = TimeEntry.objects.filter(user_profile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
-    user_data = user_data.values('project__code', 'project__name', 'user_profile__user__username', 'user_profile__submitted_until')
-    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('user_profile__user__username', 'project__code')
+    user_data = TimeEntry.objects.filter(userprofile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
+    user_data = user_data.values('project__name', 'userprofile__user__username', 'userprofile__department__code', 'userprofile__submitted_until')
+    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('userprofile__user__username', 'project__code')
 
-    users_with_no_data = list(User.objects.exclude(username__in=user_data.values('user_profile__user__username'))
-                            .values('username', 'userprofile__submitted_until')
+    users_with_no_data = list(User.objects.exclude(username__in=user_data.values('userprofile__user__username'))
+                            .values('username', 'userprofile__submitted_until', 'userprofile__department__code')
                             .order_by('username'))
     
     if base_date.month == 12:
@@ -69,26 +69,28 @@ def report(request):
     user_project_hours = []
     latest_project_added = ''
     for data_entry in user_data:
-        if data_entry['user_profile__user__username'] != current_user:
-            if current_user != data_entry['user_profile__user__username'] and current_user != '':
+        if data_entry['userprofile__user__username'] != current_user:
+            if current_user != data_entry['userprofile__user__username'] and current_user != '':
                 while len(user_project_hours) < len(projects):
                     user_project_hours.append('')
                     
             user_project_hours = []
             latest_project_added = ''
-            current_user = data_entry['user_profile__user__username']
+            current_user = data_entry['userprofile__user__username']
             
             if len(users_with_no_data) > 0:
                 while users_with_no_data[0]['username'] < current_user:
-                    context_dict['data'].append({'username': users_with_no_data[0]['username'], 
+                    context_dict['data'].append({'username': users_with_no_data[0]['username'],
+                                         'department': users_with_no_data[0]['userprofile__department__code'],
                                          'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
                                          'project_hours': ['' for i in range(len(projects))]})
                     users_with_no_data.pop(0)
                     if(len(users_with_no_data) == 0):
                         break
             
-            context_dict['data'].append({'username': data_entry['user_profile__user__username'], 
-                                         'submitted_until': data_entry['user_profile__submitted_until'], 
+            context_dict['data'].append({'username': data_entry['userprofile__user__username'], 
+                                         'department': data_entry['userprofile__department__code'],
+                                         'submitted_until': data_entry['userprofile__submitted_until'], 
                                          'project_hours': user_project_hours})
             
         for project in projects:
@@ -103,7 +105,8 @@ def report(request):
                     user_project_hours.append('')        
     
     while len(users_with_no_data) > 0:
-        context_dict['data'].append({'username': users_with_no_data[0]['username'], 
+        context_dict['data'].append({'username': users_with_no_data[0]['username'],
+                             'department': users_with_no_data[0]['userprofile__department__code'],
                              'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
                              'project_hours': ['' for i in range(len(projects))]})
         users_with_no_data.pop(0)
@@ -112,26 +115,26 @@ def report(request):
 
 @login_required
 def get_time_entries(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    userprofile = UserProfile.objects.get(user=request.user)
     # TODO: Prefetch does not work here. It spams the db with queries. 
-    projects = Project.objects.order_by('code').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(user_profile=user_profile)))
+    projects = Project.objects.order_by('code').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(userprofile=userprofile)))
 
     date_parse_string = "%Y-%m-%d"
     if 'startDate' in request.GET:        
         start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string).date()
     else:
         # sunday +1, monday +0, tuesday -1, wednesday -2, thursday -3, friday -4, saturday -5
-        weekday_nr = user_profile.submitted_until.isoweekday()
+        weekday_nr = userprofile.submitted_until.isoweekday()
         if weekday_nr == 7:
-            start_date = user_profile.submitted_until + timedelta(days=1)
+            start_date = userprofile.submitted_until + timedelta(days=1)
         else:
-            start_date = user_profile.submitted_until - timedelta(days=weekday_nr - 1)
+            start_date = userprofile.submitted_until - timedelta(days=weekday_nr - 1)
             
     end_date = start_date + timedelta(days=6)
     
     response_data = {
         'projects': [],
-        'submittedUntil': user_profile.submitted_until.strftime(date_parse_string),
+        'submittedUntil': userprofile.submitted_until.strftime(date_parse_string),
         'startDate': start_date.strftime(date_parse_string),
         'endDate': end_date.strftime(date_parse_string)}
     
@@ -144,10 +147,10 @@ def get_time_entries(request):
     
         while current_date <= end_date:
             # TODO: This is where the excess queries happen
-            entry = project.timeentry_set.filter(date=current_date, user_profile=user_profile).first()
+            entry = project.timeentry_set.filter(date=current_date, userprofile=userprofile).first()
             p['timeentries'].append({'date': current_date.strftime('%Y-%m-%d'),
                                       'hours': entry.hours if entry else None,
-                                      'submitted': current_date <= user_profile.submitted_until})
+                                      'submitted': current_date <= userprofile.submitted_until})
             
             current_date += datetime.timedelta(days=1)
             
@@ -160,13 +163,13 @@ def get_time_entries(request):
 @login_required
 def save_time_entry(request):
     if request.method == 'POST':
-        user_profile = UserProfile.objects.get(user=request.user)
+        userprofile = UserProfile.objects.get(user=request.user)
         project_id = request.POST.get('projectId')
         project = Project.objects.get(id=project_id)
         date = request.POST.get('date')
         hours = request.POST.get('hours')
         
-        entry, created = TimeEntry.objects.get_or_create(project=project, date=date, user_profile=user_profile)
+        entry, created = TimeEntry.objects.get_or_create(project=project, date=date, userprofile=userprofile)
         entry.hours = hours if hours != '' else 0
         entry.save()
         
@@ -183,9 +186,9 @@ def set_last_submitted(request):
     if request.method == 'POST':
         new_date = request.POST.get('date')
         
-        user_profile = UserProfile.objects.get(user=request.user)
-        user_profile.submitted_until = new_date
-        user_profile.save()
+        userprofile = UserProfile.objects.get(user=request.user)
+        userprofile.submitted_until = new_date
+        userprofile.save()
         
         return HttpResponse('Last submetted set to ' + new_date)
         

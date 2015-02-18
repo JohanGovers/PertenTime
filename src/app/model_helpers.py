@@ -36,7 +36,7 @@ def add_user(username, password, first_name, last_name, email, department, submi
     
     return up
 
-def add_time_entry(project, user_profile, date, hours):
-    print " - Add time entry " + str(project) + " - " + str(user_profile) + " " + str(date) + ": " + str(hours)
-    e = TimeEntry.objects.get_or_create(project=project, user_profile=user_profile, date=date, hours=hours)[0]
+def add_time_entry(project, userprofile, date, hours):
+    print " - Add time entry " + str(project) + " - " + str(userprofile) + " " + str(date) + ": " + str(hours)
+    e = TimeEntry.objects.get_or_create(project=project, userprofile=userprofile, date=date, hours=hours)[0]
     return e

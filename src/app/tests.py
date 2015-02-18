@@ -11,7 +11,7 @@ class ReportViewTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_superuser('__test_user', 'test@mail.com', 'password')
-        department = add_department('test', 'TS')
+        department = add_department('_T', 'Test')
         up = UserProfile(user=self.user)
         up.department = department
         up.submitted_until = date(2012,1,11)
@@ -32,10 +32,11 @@ class ReportViewTests(TestCase):
         project_b = add_project('b', 'project b')
         project_c = add_project('c', 'project c')
         
-        department = add_department('code', 'name')
-        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
+        department1 = add_department('code1', 'name1')
+        department2 = add_department('code2', 'name2')
+        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department2, date(2015, 1, 18))
         
         add_time_entry(project_a, user_profile_2, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_2, date(2015, 1, 13), 8)
@@ -45,10 +46,10 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
-                            {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', '', '']},
-                            {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]},
-                            {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', '', '']}]
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username1', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': ['', '', '']},
+                            {'username': u'username2', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]},
+                            {'username': u'username3', 'department': department2.code, 'submitted_until': date(2015, 1, 18), 'project_hours': ['', '', '']}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -62,10 +63,11 @@ class ReportViewTests(TestCase):
         project_b = add_project('b', 'project b')
         project_c = add_project('c', 'project c')
         
-        department = add_department('code', 'name')
-        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
+        department1 = add_department('code1', 'name1')
+        department2 = add_department('code2', 'name2')
+        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department2, date(2015, 1, 18))
         
         add_time_entry(project_a, user_profile_1, date(2015, 1, 12), 1)
         add_time_entry(project_b, user_profile_1, date(2015, 1, 13), 2)
@@ -84,10 +86,10 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
-                            {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': [1, 2, 3]},
-                            {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': [4, 5, 6]},
-                            {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 8, 9]}]
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username1', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [1, 2, 3]},
+                            {'username': u'username2', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [4, 5, 6]},
+                            {'username': u'username3', 'department': department2.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 8, 9]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -112,8 +114,8 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
-                            {'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]}]
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username', 'department': department.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [7, '', 8]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -127,10 +129,11 @@ class ReportViewTests(TestCase):
         project_b = add_project('b', 'project b')
         project_c = add_project('c', 'project c')
         
-        department = add_department('code', 'name')
-        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
+        department1 = add_department('code1', 'name1')
+        department2 = add_department('code2', 'name2')
+        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department2, date(2015, 1, 18))
         
         add_time_entry(project_b, user_profile_1, date(2015, 1, 12), 1)
         add_time_entry(project_c, user_profile_1, date(2015, 1, 14), 3)
@@ -146,10 +149,10 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
-                            {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 1, 3]},
-                            {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 4, 6]},
-                            {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 7, 9]}]
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username1', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 1, 3]},
+                            {'username': u'username2', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 4, 6]},
+                            {'username': u'username3', 'department': department2.code, 'submitted_until': date(2015, 1, 18), 'project_hours': ['', 7, 9]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -163,10 +166,11 @@ class ReportViewTests(TestCase):
         project_b = add_project('b', 'project b')
         project_c = add_project('c', 'project c')
         
-        department = add_department('code', 'name')
-        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
-        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department, date(2015, 1, 18))
+        department1 = add_department('code1', 'name1')
+        department2 = add_department('code2', 'name2')
+        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department2, date(2015, 1, 18))
         
         add_time_entry(project_a, user_profile_1, date(2015, 1, 12), 1)
         add_time_entry(project_b, user_profile_1, date(2015, 1, 13), 2)
@@ -182,10 +186,10 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
-                            {'username': u'username1', 'submitted_until': date(2015, 1, 18), 'project_hours': [1, 2, '']},
-                            {'username': u'username2', 'submitted_until': date(2015, 1, 18), 'project_hours': [4, 5, '']},
-                            {'username': u'username3', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 8, '']}]
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username1', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [1, 2, '']},
+                            {'username': u'username2', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [4, 5, '']},
+                            {'username': u'username3', 'department': department2.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 8, '']}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -212,8 +216,8 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
-                            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
-                            {'username': u'username', 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 1, 8]}]
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+                            {'username': u'username', 'department': department.code, 'submitted_until': date(2015, 1, 18), 'project_hours': [7, 1, 8]}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -239,10 +243,10 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b]
         expected_data = [
-            {'username': u'__test_user', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '']},
-            {'username': u'user with entries in other month', 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '']},
-            {'username': u'user with no entries', 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '']},
-            {'username': u'username1', 'submitted_until': date(2015, 5, 18), 'project_hours': [7, '']}]
+            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '']},
+            {'username': u'user with entries in other month', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '']},
+            {'username': u'user with no entries', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '']},
+            {'username': u'username1', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'project_hours': [7, '']}]
         
         self.assert_projects(response.context['projects'], expected_projects)
         

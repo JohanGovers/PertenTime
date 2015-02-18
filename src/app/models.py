@@ -31,7 +31,7 @@ class TimeEntry(models.Model):
     date = models.DateField()
     hours = models.DecimalField(default=0, max_digits=4, decimal_places=2)
     project = models.ForeignKey(Project)
-    user_profile = models.ForeignKey(UserProfile)
+    userprofile = models.ForeignKey(UserProfile)
     
     def __unicode__(self):
         return str(self.date) + ": " + str(self.hours) + " h"
