@@ -251,3 +251,39 @@ class ReportViewTests(TestCase):
         self.assert_projects(response.context['projects'], expected_projects)
         
         self.assertEqual(response.context['data'], expected_data)
+        
+    def test_order(self):
+        project_b = add_project('b', 'project 1b')
+        project_a = add_project('a', 'project 2a')
+        project_c = add_project('c', 'project 1c')
+     
+        department1 = add_department('1', 'name')
+        department2 = add_department('2', 'name')
+        department3 = add_department('3', 'name')
+        
+        user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department2, date(2015, 5, 18))
+        user_profile_2 = add_user('username2', 'password', 'first_name', 'last_name', 'email', department3, date(2015, 5, 18))
+        user_profile_3 = add_user('username3', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 5, 18))
+        user_profile_4 = add_user('username4', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 5, 18))
+        user_profile_5 = add_user('user5', 'password', 'first_name', 'last_name', 'email', department2, date(2015, 5, 18))
+        
+        add_time_entry(project_a, user_profile_1, date(2015, 2, 12), 6)
+        add_time_entry(project_b, user_profile_2, date(2015, 2, 2), 7)
+        add_time_entry(project_c, user_profile_3, date(2015, 2, 2), 8)
+        
+        response = self.client.get(reverse('app.views.report'), {'month': 2, 'year': 2015})
+        self.assertEqual(response.status_code, 200)
+        
+        expected_projects = [project_a, project_b, project_c]
+        expected_data = [
+            {'username': u'username3', 'department': department1.code, 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '', 8]},
+            {'username': u'username4', 'department': department1.code, 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '', '']},
+            {'username': u'user5', 'department': department2.code, 'submitted_until': date(2015, 5, 18), 'project_hours': ['', '', '']},
+            {'username': u'username1', 'department': department2.code, 'submitted_until': date(2015, 5, 18), 'project_hours': [6, '', '']},
+            {'username': u'username2', 'department': department3.code, 'submitted_until': date(2015, 5, 18), 'project_hours': ['', 7, '']},
+            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'project_hours': ['', '', '']},
+            ]
+        
+        self.assert_projects(response.context['projects'], expected_projects)
+        
+        self.assertEqual(response.context['data'], expected_data)

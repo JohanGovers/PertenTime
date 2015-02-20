@@ -22,6 +22,7 @@
         	<thead>
         		<tr>
         			<th>User</th>
+				<th>Department</th>
         			<th>Submitted until</th>
         			{% for project in projects %}
         			<th>{{ project }}</th>
@@ -32,6 +33,7 @@
         		{% for row in data %}
 	        	<tr>
 	        		<td>{{ row.username }}</td>
+				<td>{{ row.department }}</td>
 	        		<td>{{ row.submitted_until }}</td>
 	        		{% for hours in row.project_hours %}
 	        		<td>{{ hours }}</td>

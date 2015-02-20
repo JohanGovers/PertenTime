@@ -32,18 +32,6 @@ def report(request):
     if 'year' in request.GET:
         base_date = base_date.replace(year=int(request.GET['year']))
     
-    start_date = base_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    end_day = calendar.monthrange(base_date.year, base_date.month)[1]
-    end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
-    
-    user_data = TimeEntry.objects.filter(userprofile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
-    user_data = user_data.values('project__name', 'userprofile__user__username', 'userprofile__department__code', 'userprofile__submitted_until')
-    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('userprofile__user__username', 'project__code')
-
-    users_with_no_data = list(User.objects.exclude(username__in=user_data.values('userprofile__user__username'))
-                            .values('username', 'userprofile__submitted_until', 'userprofile__department__code')
-                            .order_by('username'))
-    
     if base_date.month == 12:
         next_year = base_date.year + 1
         next_month = 1
@@ -59,6 +47,18 @@ def report(request):
         next_month = base_date.month + 1
         previous_year = base_date.year
         previous_month = base_date.month - 1
+        
+    start_date = base_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    end_day = calendar.monthrange(base_date.year, base_date.month)[1]
+    end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
+    
+    user_data = TimeEntry.objects.filter(userprofile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
+    user_data = user_data.values('project__name', 'project__code', 'userprofile__user__username', 'userprofile__department__code', 'userprofile__submitted_until')
+    user_data = user_data.annotate(total_hours=Sum('hours')).order_by('userprofile__department__code', 'userprofile__user__username', 'project__code')
+
+    users_with_no_data = list(User.objects.exclude(username__in=user_data.values('userprofile__user__username'))
+                            .values('username', 'userprofile__submitted_until', 'userprofile__department__code')
+                            .order_by('userprofile__department__code', 'username'))
     
     context_dict = {'data': [], 'projects': projects,
         'year': base_date.year, 'month': base_date.month,
@@ -79,7 +79,7 @@ def report(request):
             current_user = data_entry['userprofile__user__username']
             
             if len(users_with_no_data) > 0:
-                while users_with_no_data[0]['username'] < current_user:
+                while users_with_no_data[0]['userprofile__department__code'] < data_entry['userprofile__department__code'] or users_with_no_data[0]['userprofile__department__code'] == data_entry['userprofile__department__code'] and users_with_no_data[0]['username'] < current_user:
                     context_dict['data'].append({'username': users_with_no_data[0]['username'],
                                          'department': users_with_no_data[0]['userprofile__department__code'],
                                          'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
@@ -94,11 +94,11 @@ def report(request):
                                          'project_hours': user_project_hours})
             
         for project in projects:
-            if data_entry['project__name'] == project.name:
+            if data_entry['project__code'] == project.code:
                 user_project_hours.append(data_entry['total_hours'])
-                latest_project_added = project.name
+                latest_project_added = project.code
                 break
-            elif latest_project_added < project.name < data_entry['project__name']: 
+            elif latest_project_added < project.code < data_entry['project__code']: 
                 user_project_hours.append('')
                 
     while len(user_project_hours) < len(projects):
