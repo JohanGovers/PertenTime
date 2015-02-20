@@ -2,12 +2,10 @@ from django.contrib.auth.models import User
 from app.models import Project, Department, UserProfile, TimeEntry
 
 def add_project(code, name):
-    print " - Add project " + code + " - " + name
     p = Project.objects.get_or_create(code=code, name=name)[0]
     return p
 
 def add_department(code, name):
-    print " - Add department " + code + " - " + name
     d = Department.objects.get_or_create(code=code, name=name)[0]
     return d
 
@@ -15,17 +13,14 @@ def add_user(username, password, first_name, last_name, email, department, submi
     try:
         u = User.objects.get_by_natural_key(username)
     except User.DoesNotExist:
-        print " - Add user " + username
         u = User.objects.create_user(username=username, email=email, password=password)
     
-    print " - Set properties on " + username
     u.set_password(password)
     u.email = email
     u.first_name = first_name
     u.last_name = last_name
     u.save()
 
-    print " - Save user profile for " + username
     try:
         up = UserProfile.objects.get(user=u)
     except UserProfile.DoesNotExist:
@@ -37,6 +32,5 @@ def add_user(username, password, first_name, last_name, email, department, submi
     return up
 
 def add_time_entry(project, userprofile, date, hours):
-    print " - Add time entry " + str(project) + " - " + str(userprofile) + " " + str(date) + ": " + str(hours)
     e = TimeEntry.objects.get_or_create(project=project, userprofile=userprofile, date=date, hours=hours)[0]
     return e
