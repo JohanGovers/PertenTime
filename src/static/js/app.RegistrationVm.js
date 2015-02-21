@@ -1,4 +1,4 @@
-function TimeEntry(projectId, date, hours, submitted) {
+function TimeEntry(projectId, date, hours, submitted, vm) {
 	var self = this;
 	
 	self.projectId = projectId;
@@ -38,13 +38,12 @@ function TimeEntry(projectId, date, hours, submitted) {
 			//	console.log(data);
 			//})
 			.fail(function(req, status, error){
-				// TODO: Show some error message in the UI.
-				console.error(status, error, "Something went wrong when saving.", self, "Hours: " + self.hours() );
+				vm.logError(status, error);
 		});
 	});
 }
 
-function Project(id, code, name, timeentries) {
+function Project(id, code, name, timeentries, vm) {
 	var self = this;
 	
 	self.id = id;
@@ -52,7 +51,7 @@ function Project(id, code, name, timeentries) {
 	self.name = name;
 	
 	self.timeentries = ko.observableArray(timeentries.map(function(entry){
-		return new TimeEntry(id, entry.date, entry.hours, entry.submitted);
+		return new TimeEntry(id, entry.date, entry.hours, entry.submitted, vm);
 	}));
 }
 
@@ -60,6 +59,11 @@ function RegistrationVm() {
 	var self = this;
 	
 	self.dataLoadingInProgress = ko.observable(false);
+	self.showErrorMessage = ko.observable(false);
+	self.logError = function(status, error){
+		console.error(status, error, "Something went wrong when submitting.", self);
+		self.showErrorMessage(true);
+	};
 	
 	self.startDate = undefined;
 	self.endDate = undefined;
@@ -76,17 +80,26 @@ function RegistrationVm() {
 			if (!!self.startDate) {
 				requestData = { startDate: self.startDate.format("YYYY-MM-DD") }
 			}
-			$.get('get_time_entries', requestData, function(data){
+			
+			$.ajax({
+				type: 'GET',
+				url: 'get_time_entries',
+				data: requestData,
+			})
+			.done(function(data){
 				self.projects.removeAll();
 				self.submittedUntil = moment(data.submittedUntil);
 				self.startDate = moment(data.startDate);
 				self.endDate = moment(data.endDate);
 				self.allSubmitted(self.endDate <= self.submittedUntil);
 				for (var i = 0; i < data.projects.length; i++) {
-					self.projects.push(new Project(data.projects[i].id, data.projects[i].code, data.projects[i].name, data.projects[i].timeentries));
+					self.projects.push(new Project(data.projects[i].id, data.projects[i].code, data.projects[i].name, data.projects[i].timeentries, self));
 				}
 				
 				self.dataLoadingInProgress(false);
+			})
+			.fail(function(req, status, error){
+				self.logError(status, error);
 			});
 		}
 	}
@@ -126,8 +139,7 @@ function RegistrationVm() {
 				self.loadData();
 			})
 			.fail(function(req, status, error){
-				// TODO: Show some error message in the UI.
-				console.error(status, error, "Something went wrong when submitting.", self);
+				self.logError(status, error);
 			});
 	}
 }
