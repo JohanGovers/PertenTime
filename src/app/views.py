@@ -149,7 +149,7 @@ def get_time_entries(request):
             # TODO: This is where the excess queries happen
             entry = project.timeentry_set.filter(date=current_date, userprofile=userprofile).first()
             p['timeentries'].append({'date': current_date.strftime('%Y-%m-%d'),
-                                      'hours': entry.hours if entry else None,
+                                      'hours': str(entry.hours) if entry else None,
                                       'submitted': current_date <= userprofile.submitted_until})
             
             current_date += datetime.timedelta(days=1)
