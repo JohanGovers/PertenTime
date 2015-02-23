@@ -24,8 +24,8 @@ def report(request):
     projects = Project.objects.order_by('code')
     
     now = datetime.datetime.now()
-    now_day_count = calendar.monthrange(now.year, now.month)[1]
-    base_date = datetime.datetime.now() - timedelta(days=now_day_count)
+    this_month_day_count = calendar.monthrange(now.year, now.month)[1]
+    base_date = datetime.datetime.now() - timedelta(days=this_month_day_count)
     base_date = base_date.replace(day=1) #there is always a first in every month
     if 'month' in request.GET:
         base_date = base_date.replace(month=int(request.GET['month']))
@@ -80,9 +80,11 @@ def report(request):
             
             if len(users_with_no_data) > 0:
                 while users_with_no_data[0]['userprofile__department__code'] < data_entry['userprofile__department__code'] or users_with_no_data[0]['userprofile__department__code'] == data_entry['userprofile__department__code'] and users_with_no_data[0]['username'] < current_user:
-                    context_dict['data'].append({'username': users_with_no_data[0]['username'],
+                    context_dict['data'].append({
+                                         'username': users_with_no_data[0]['username'],
                                          'department': users_with_no_data[0]['userprofile__department__code'],
                                          'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
+                                         'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date.date(),
                                          'project_hours': ['' for i in range(len(projects))]})
                     users_with_no_data.pop(0)
                     if(len(users_with_no_data) == 0):
@@ -91,6 +93,7 @@ def report(request):
             context_dict['data'].append({'username': data_entry['userprofile__user__username'], 
                                          'department': data_entry['userprofile__department__code'],
                                          'submitted_until': data_entry['userprofile__submitted_until'], 
+                                         'late_submission': data_entry['userprofile__submitted_until'] < end_date.date(),
                                          'project_hours': user_project_hours})
             
         for project in projects:
@@ -108,6 +111,7 @@ def report(request):
         context_dict['data'].append({'username': users_with_no_data[0]['username'],
                              'department': users_with_no_data[0]['userprofile__department__code'],
                              'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
+                             'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date.date(),
                              'project_hours': ['' for i in range(len(projects))]})
         users_with_no_data.pop(0)
     
