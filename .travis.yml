@@ -6,6 +6,8 @@ install:
   - pip install -r requirements.txt
   - pip install coveralls
 # command to run tests, e.g. python setup.py test
-script:  python src/manage.py test app
+# --source specifies what packages to cover, you probably want to use that option
+script:
+  coverage run --source=app src/manage.py test app
 after_success:
   coveralls
