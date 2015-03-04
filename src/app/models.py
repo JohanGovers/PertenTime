@@ -5,7 +5,7 @@ class Project(models.Model):
     code = models.CharField(max_length=256, unique=True)
     name = models.CharField(max_length=256, unique=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.code + " - " + self.name
 
 class Department(models.Model):
@@ -13,7 +13,7 @@ class Department(models.Model):
     
     name = models.CharField(max_length=256, blank=False)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.code + " - " + self.name
     
 class UserProfile(models.Model):
@@ -22,7 +22,7 @@ class UserProfile(models.Model):
     department = models.ForeignKey(Department)
     submitted_until = models.DateField()
     
-    def __unicode__(self):
+    def __str__(self):
         return self.user.username
 
 # TODO: remove hard link to user
@@ -33,5 +33,5 @@ class TimeEntry(models.Model):
     project = models.ForeignKey(Project)
     userprofile = models.ForeignKey(UserProfile)
     
-    def __unicode__(self):
+    def __str__(self):
         return str(self.date) + ": " + str(self.hours) + " h"
