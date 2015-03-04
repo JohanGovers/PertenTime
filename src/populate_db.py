@@ -91,5 +91,5 @@ def populate():
     add_time_entry(invisible_screen, luke, date(2015, 1, 16), 8)
 
 if __name__ == '__main__':
-    print "Starting project population script..."
+    print ("Starting project population script...")
     populate()
