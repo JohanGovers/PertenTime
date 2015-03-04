@@ -14,15 +14,23 @@ git clone https://github.com/JohanGovers/PertenTime.git
 cd PertenTime
 
 pip install virtualenvwrapper-win
+
 mkvirtualenv PertenTime
+
 workon PertenTime
+
 setprojectdir .
+
 pip install -r requirements.txt
 
 cd src
+
 python manage.py migrate
+
 python populate_db.py
+
 python manage.py test app
+
 python manage.py runserver
 
 
