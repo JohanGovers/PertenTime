@@ -7,7 +7,8 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
-import os
+import os, sys
+sys.path.append('/usr/local/www/PertenTime/src')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PertenTime.settings")
 
 from django.core.wsgi import get_wsgi_application
