@@ -209,10 +209,20 @@ def register(request):
             user.set_password(user.password)
             user.save()
 
+            last_submitted = datetime.datetime.now()
+            if(last_submitted.month == 1):
+                last_submitted.replace(month=12)
+            else:
+                last_submitted.replace(month=last_submitted.month-1)
+            
+            last_day_in_month = calendar.monthrange(last_submitted.year, last_submitted.month)[1]
+            last_submitted.replace(day=last_day_in_month)
+
             # Since we need to set the user attribute ourselves, we set commit=False.
             # This delays saving the model until we're ready to avoid integrity problems.
             profile = profile_form.save(commit=False)
             profile.user = user
+            profile.submitted_until = last_submitted
             profile.save()
 
             registered = True
