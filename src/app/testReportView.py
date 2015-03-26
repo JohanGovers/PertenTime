@@ -24,6 +24,34 @@ class ReportViewTests(TestCase):
             self.assertEqual(responseProjects[i].name, project.name)
         return
 
+    def test_date_filter(self):
+            """
+            Test the filter on submitted_until. Make sure time is included as
+            it should.
+            """
+            project_a = add_project('a', 'project a')
+            
+            department1 = add_department('code1', 'name1')
+            user_profile_1 = add_user('username1', 'password', 'first_name', 'last_name', 'email', department1, date(2015, 1, 18))
+            
+            add_time_entry(project_a, user_profile_1, date(2014, 12, 31), 6)
+            add_time_entry(project_a, user_profile_1, date(2015, 1, 1), 7)
+            add_time_entry(project_a, user_profile_1, date(2015, 1, 18), 8)
+            add_time_entry(project_a, user_profile_1, date(2015, 1, 19), 9)
+            
+            response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+            self.assertEqual(response.status_code, 200)
+            
+            expected_projects = [project_a]
+            expected_data = [
+                                {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'late_submission': True, 'project_hours': ['']},
+                                {'username': u'username1', 'department': department1.code, 'submitted_until': date(2015, 1, 18), 'late_submission': True, 'project_hours': [15]}]
+                                            
+            self.assert_projects(response.context['projects'], expected_projects)
+            
+            self.assertEqual(response.context['data'], expected_data)
+    
+
     def test_only_middle_user_has_time(self):
         """
         Three projects, three users only middle user has time. All users should be in the list.
