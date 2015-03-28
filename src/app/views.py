@@ -186,6 +186,8 @@ def save_time_entry(request):
             json.dumps(response_data),
             content_type="application/json"
         )
+    else:
+        return HttpResponse()
 
 @login_required        
 def set_last_submitted(request):
@@ -197,6 +199,8 @@ def set_last_submitted(request):
         userprofile.save()
         
         return HttpResponse('Last submetted set to ' + new_date)
+    else:
+        return HttpResponse()
         
 def register(request):
     registered = False
