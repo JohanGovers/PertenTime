@@ -4,8 +4,10 @@
 	<h1>Project time report</h1>
 	<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
 	<p>
-		<button type="button" data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><< Previous week</button>
-		<button type="button" data-bind="click: loadNextWeek, enable: allSubmitted() && !dataLoadingInProgress()">Next week >></button>
+		<ul class="button-bar">
+			<li><a data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><i class="fa fa-angle-double-left"></i> Previous week</a></li>
+			<li><a type="button" data-bind="click: loadNextWeek, enable: allSubmitted() && !dataLoadingInProgress()">Next week <i class="fa fa-angle-double-right"></i></a></li>
+		</ul>		
 	</p>
 	<table>
 		<thead>
@@ -27,7 +29,7 @@
 			</tr>
 		<tbody>
 	</table>
-	<p><button type="button" data-bind="click: submitUntilCurrentWeek, disable: dataLoadingInProgress">Submit</button></p>
+	<p><button class="orange" type="button" data-bind="click: submitUntilCurrentWeek, disable: dataLoadingInProgress">Submit</button></p>
 	<img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
 	<p data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
 	the page to solve the problem. If that doesn't help <a href="mailto:johan.govers@gmail.com">let us know</a>.</p>
