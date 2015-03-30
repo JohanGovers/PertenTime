@@ -2,6 +2,8 @@ import calendar
 
 def get_last_date_of_previous_month(in_date):
     date = in_date
+    date = date.replace(day=1) #every month has a first
+    
     if(date.month == 1):
         current_year = date.year
         date = date.replace(year=current_year-1, month=12)

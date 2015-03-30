@@ -26,5 +26,13 @@ class DateHelperTests(TestCase):
             """
             self.assertEquals(
                 get_last_date_of_previous_month(date(2012,1,11)), 
-                                                date(2011,12,31))    
+                                                date(2011,12,31))
+            
+    def test_current_date_has_later_day_than_last_day_of_previous_month(self):
+                """
+                Test 2015-03-30 since it failed.
+                """
+                self.assertEquals(
+                    get_last_date_of_previous_month(date(2015,3,30)), 
+                                                    date(2015,2,28))        
     

@@ -27,8 +27,6 @@ class BrowseUrlTests(TestCase):
         
         # print(urls.urlpatterns)
         for url in urls.urlpatterns:
-            print(url.name)
-            
             response = self.client.get(reverse(url.name))
             self.assertTrue(response.status_code in accepted_codes)
                 
