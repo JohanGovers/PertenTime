@@ -1,52 +1,34 @@
-<!DOCTYPE html>
-
+{% extends 'app/base.html' %}
 {% load static %}
-
-<html>
-    <head>
-        <title>Perten Time</title>
-    </head>
-
-    <body>
-        <h1>Project time report</h1>
-		<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
-		<p>
-			<button type="button" data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><< Previous week</button>
-			<button type="button" data-bind="click: loadNextWeek, enable: allSubmitted() && !dataLoadingInProgress()">Next week >></button>
-		</p>
-		<table>
-        	<thead>
-        		<tr>
-        			<th>Project</th>
-        			<!-- ko if: projects()[0] -->
-        			<!-- ko foreach: projects()[0].timeentries -->
-        			<th data-bind="text: date"></th>
-        			<!-- /ko -->
-        			<!-- /ko -->
-        		</tr>
-        	</thead>
-        	<tbody data-bind="foreach: projects">
-	        	<tr>
-	        		<td data-bind="text: code + ' - ' + name"></td>
-	        		<!-- ko foreach: $data.timeentries -->
-        			<td><input data-bind="value: hours, valueUpdate: 'keyup', disable: submitted() || $root.dataLoadingInProgress()"></td>
-        			<!-- /ko -->
-	        	</tr>
-        	<tbody>
-        </table>
-        <p><button type="button" data-bind="click: submitUntilCurrentWeek, disable: dataLoadingInProgress">Submit</button></p>
-        <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
+{% block body_block %}
+	<h1>Project time report</h1>
+	<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
+	<p>
+		<button type="button" data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><< Previous week</button>
+		<button type="button" data-bind="click: loadNextWeek, enable: allSubmitted() && !dataLoadingInProgress()">Next week >></button>
+	</p>
+	<table>
+		<thead>
+			<tr>
+				<th>Project</th>
+				<!-- ko if: projects()[0] -->
+				<!-- ko foreach: projects()[0].timeentries -->
+				<th data-bind="text: date"></th>
+				<!-- /ko -->
+				<!-- /ko -->
+			</tr>
+		</thead>
+		<tbody data-bind="foreach: projects">
+			<tr>
+				<td data-bind="text: code + ' - ' + name"></td>
+				<!-- ko foreach: $data.timeentries -->
+				<td><input style="padding: 5px;" class="col_10 right" data-bind="value: hours, valueUpdate: 'keyup', disable: submitted() || $root.dataLoadingInProgress()"></td>
+				<!-- /ko -->
+			</tr>
+		<tbody>
+	</table>
+	<p><button type="button" data-bind="click: submitUntilCurrentWeek, disable: dataLoadingInProgress">Submit</button></p>
+	<img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
 	<p data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
 	the page to solve the problem. If that doesn't help <a href="mailto:johan.govers@gmail.com">let us know</a>.</p>
-    </body>
-
-	
-	<script src="{% static "js/moment.js" %}"></script>
-	<script src="{% static "js/jquery-2.1.3.js" %}"></script>
-	<script src="{% static "js/jquery.cookie.js" %}"></script>
-	<script src="{% static "js/knockout-3.2.0.js" %}"></script>
-	<script src="{% static "js/app.setup.js" %}"></script>
-	
-	<script src="{% static "js/app.RegistrationVm.js" %}"></script>
-	<script src="{% static "js/app.index.js" %}"></script>
-</html>
+{% endblock %}
