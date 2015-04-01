@@ -4,9 +4,11 @@
     <body>
         <h1>Report for {{year}}-{{month}}</h1>
 	<p>
-	    <a href="{{ query_for_previous }}"><< Previous month</a>
-	    <a href="{{ query_for_next }}">Next month >></a>
-	    <a href="javascript:tableToExcel('report')">Download as excel sheet</a>
+		<ul class="button-bar">
+			<li><a href="{{ query_for_previous }}" class="small"><i class="fa fa-angle-double-left"></i> Previous month</a></li>
+			<li><a href="{{ query_for_next }}" class="small">Next month <i class="fa fa-angle-double-right"></i></a></li>
+			<li><a href="javascript:tableToExcel('report')" class="small"><i class="fa fa-file-excel-o"></i> Download as excel sheet</a></li>
+		</ul>
 	</p>
         <table id="report">
         	<thead>
