@@ -1,17 +1,6 @@
-<!DOCTYPE html>
-
+{% extends 'app/base.html' %}
 {% load static %}
-
-<style>
-	table, th, td {
-	   border: 1px solid black;
-}</style>
-
-<html>
-    <head>
-        <title>Perten Time - Report</title>
-    </head>
-
+{% block body_block %}
     <body>
         <h1>Report for {{year}}-{{month}}</h1>
 	<p>
@@ -49,6 +38,8 @@
         </table>
         <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
     </body>
+{% endblock %}
+{% block scriptblock %}
     <script>
 	// Inspired by: http://stackoverflow.com/questions/6955627/export-dynamic-html-table-to-excel-in-javascript-in-firefox-browser
 	var tableToExcel = (function() {
@@ -63,4 +54,4 @@
 	    }
       })()
     </script>
-</html>
+{% endblock %}

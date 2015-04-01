@@ -34,3 +34,13 @@
 	<p data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
 	the page to solve the problem. If that doesn't help <a href="mailto:johan.govers@gmail.com">let us know</a>.</p>
 {% endblock %}
+{% block script_block %}
+	<script src="{% static "js/moment.js" %}"></script>
+	<script src="{% static "js/jquery-2.1.3.js" %}"></script>
+	<script src="{% static "js/jquery.cookie.js" %}"></script>
+	<script src="{% static "js/knockout-3.2.0.js" %}"></script>
+	<script src="{% static "js/app.setup.js" %}"></script>
+	
+	<script src="{% static "js/app.RegistrationVm.js" %}"></script>
+	<script src="{% static "js/app.index.js" %}"></script>
+{% endblock %}
