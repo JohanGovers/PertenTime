@@ -31,7 +31,7 @@
 	</table>
 	<p><button class="orange" type="button" data-bind="click: submitUntilCurrentWeek, disable: dataLoadingInProgress">Submit</button></p>
 	<img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
-	<p data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
+	<p style="color: red" data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
 	the page to solve the problem. If that doesn't help <a href="mailto:johan.govers@gmail.com">let us know</a>.</p>
 {% endblock %}
 {% block script_block %}
