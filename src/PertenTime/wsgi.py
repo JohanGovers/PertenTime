@@ -8,6 +8,11 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
 import os, sys
+
+# Possibly a hack? Added to get the admin interface and the report to handle the Swedish specific characters. 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 sys.path.append('/usr/local/www/PertenTime/src')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PertenTime.settings")
 
