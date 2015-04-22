@@ -1,12 +1,21 @@
 {% extends 'app/base.html' %}
 {% load static %}
 {% block body_block %}
+	<style>
+	    .week-nav{
+		cursor: hand; cursor: pointer;
+	    }
+	    
+	    .week-nav.disabled{
+		cursor: not-allowed;
+	    }
+	</style>
 	<h1>Project time report</h1>
 	<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
 	<p>
 		<ul class="button-bar">
-			<li><a data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><i class="fa fa-angle-double-left"></i> Previous week</a></li>
-			<li><a type="button" data-bind="click: loadNextWeek, enable: allSubmitted() && !dataLoadingInProgress()">Next week <i class="fa fa-angle-double-right"></i></a></li>
+			<li><a class="week-nav" data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><i class="fa fa-angle-double-left"></i> Previous week</a></li>
+			<li><a class="week-nav" type="button" data-bind="click: loadNextWeek, css: {disabled: !allSubmitted() || dataLoadingInProgress()}">Next week <i class="fa fa-angle-double-right"></i></a></li>
 		</ul>		
 	</p>
 	<table>

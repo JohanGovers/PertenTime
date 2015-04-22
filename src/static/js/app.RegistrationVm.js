@@ -105,6 +105,9 @@ function RegistrationVm() {
 	}
 	
 	self.loadNextWeek = function () {
+		if (!self.allSubmitted()) {
+			return;
+		}
 		self.startDate = self.startDate.add(7, 'days');
 		self.endDate = self.endDate.add(7, 'days');
 		
