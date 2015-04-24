@@ -9,6 +9,10 @@
 	    .week-nav.disabled{
 		cursor: not-allowed;
 	    }
+	    
+	    .no-border th{
+		border: 0px;
+	    }
 	</style>
 	<h1>Project time report</h1>
 	<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
@@ -20,6 +24,16 @@
 	</p>
 	<table>
 		<thead>
+			<tr class="no-border">
+				<th></th>
+				<th>Monday</th>
+				<th>Tuesday</th>
+				<th>Wednesday</th>
+				<th>Thursday</th>
+				<th>Friday</th>
+				<th>Saturday</th>
+				<th>Sunday</th>
+			</tr>
 			<tr>
 				<th>Project</th>
 				<!-- ko if: projects()[0] -->
