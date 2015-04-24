@@ -10,10 +10,10 @@ function TimeEntry(projectId, date, hours, submitted, vm) {
 		//Sanitize input of time.
 		var value = self.hours();
 		
-		self.hours(self.hours().replace(',', '.'));
+		var value = self.hours().replace(',', '.');
 	
 		//No non numeric characters.
-		var value = value.replace(/[^\d.$]/g, '');
+		value = value.replace(/[^\d.$]/g, '');
 		
 		//Only one decimal point
 		if ((value.match(/\./g) || []).length > 1) {
