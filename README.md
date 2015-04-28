@@ -10,11 +10,7 @@ This section guides you step by step on how to install the necessary prerequisit
 ### Prerequisites
 First you need to download and install Python3 from https://www.python.org/. You'll also need to install [git](http://git-scm.com/downloads).
 
-Then you're ready to clone this repository. Open a command prompt and run
-
-```
-git clone https://github.com/JohanGovers/PertenTime.git
-```
+Then you're ready to fork this repository. If you don't know how to do, follow [these guidelines](https://help.github.com/articles/fork-a-repo/).
 
 #### Setting up virtualenv
 Enter the repository and install virtualenv for windows. Then create a new virtualenv for this project, enter it, set the project directory to the root of the repository and install the python packages needed to run the code. All this is done by issueing the following commands.
