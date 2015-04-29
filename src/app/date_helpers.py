@@ -1,4 +1,4 @@
-import calendar
+import calendar, datetime
 
 def get_last_date_of_previous_month(in_date):
     date = in_date
@@ -14,3 +14,8 @@ def get_last_date_of_previous_month(in_date):
     date = date.replace(day=last_day_in_month)
     
     return date
+
+def string_to_date(date_string):
+    date_parse_string = "%Y-%m-%d"
+    
+    return datetime.datetime.strptime(date_string, date_parse_string).date()
