@@ -38,8 +38,8 @@ class ReportViewTests(TestCase):
             add_time_entry(project_a, user_profile_1, date(2015, 1, 1), 7)
             add_time_entry(project_a, user_profile_1, date(2015, 1, 18), 8)
             add_time_entry(project_a, user_profile_1, date(2015, 1, 19), 9)
-            
-            response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+                        
+            response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
             self.assertEqual(response.status_code, 200)
             
             expected_projects = [project_a]
@@ -69,7 +69,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile_2, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_2, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -109,7 +109,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_3, date(2015, 1, 13), 8)
         add_time_entry(project_c, user_profile_3, date(2015, 1, 14), 9)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -137,7 +137,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -172,7 +172,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_3, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_3, date(2015, 1, 14), 9)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -209,7 +209,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile_3, date(2015, 1, 12), 7)
         add_time_entry(project_b, user_profile_3, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -239,7 +239,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile, date(2015, 1, 19), 1)
         add_time_entry(project_c, user_profile, date(2015, 1, 20), 8)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 1, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -266,7 +266,7 @@ class ReportViewTests(TestCase):
         
         add_time_entry(project_b, user_profile_2, date(2015, 4, 4), 5)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 3, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 3, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b]
@@ -299,7 +299,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_2, date(2015, 2, 2), 7)
         add_time_entry(project_c, user_profile_3, date(2015, 2, 2), 8)
         
-        response = self.client.get(reverse('app.views.report'), {'month': 2, 'year': 2015})
+        response = self.client.get(reverse('report'), {'month': 2, 'year': 2015})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
