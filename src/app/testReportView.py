@@ -39,7 +39,7 @@ class ReportViewTests(TestCase):
             add_time_entry(project_a, user_profile_1, date(2015, 1, 18), 8)
             add_time_entry(project_a, user_profile_1, date(2015, 1, 19), 9)
                         
-            response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+            response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
             self.assertEqual(response.status_code, 200)
             
             expected_projects = [project_a]
@@ -69,7 +69,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile_2, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_2, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -109,7 +109,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_3, date(2015, 1, 13), 8)
         add_time_entry(project_c, user_profile_3, date(2015, 1, 14), 9)
         
-        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -137,7 +137,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -172,7 +172,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_3, date(2015, 1, 12), 7)
         add_time_entry(project_c, user_profile_3, date(2015, 1, 14), 9)
         
-        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -209,7 +209,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_a, user_profile_3, date(2015, 1, 12), 7)
         add_time_entry(project_b, user_profile_3, date(2015, 1, 13), 8)
         
-        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -239,7 +239,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile, date(2015, 1, 19), 1)
         add_time_entry(project_c, user_profile, date(2015, 1, 20), 8)
         
-        response = self.client.get(reverse('report'), {'month': 1, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-01-01', 'to_date': '2015-01-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -266,7 +266,7 @@ class ReportViewTests(TestCase):
         
         add_time_entry(project_b, user_profile_2, date(2015, 4, 4), 5)
         
-        response = self.client.get(reverse('report'), {'month': 3, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-03-01', 'to_date': '2015-03-31'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b]
@@ -299,7 +299,7 @@ class ReportViewTests(TestCase):
         add_time_entry(project_b, user_profile_2, date(2015, 2, 2), 7)
         add_time_entry(project_c, user_profile_3, date(2015, 2, 2), 8)
         
-        response = self.client.get(reverse('report'), {'month': 2, 'year': 2015})
+        response = self.client.post(reverse('report'), {'from_date': '2015-02-01', 'to_date': '2015-02-28'})
         self.assertEqual(response.status_code, 200)
         
         expected_projects = [project_a, project_b, project_c]
@@ -313,5 +313,34 @@ class ReportViewTests(TestCase):
             ]
         
         self.assert_projects(response.context['projects'], expected_projects)
-        
         self.assertEqual(response.context['data'], expected_data)
+        
+    def test_filter_boundaries(self):
+        project_a = add_project('a', 'project a')
+        
+        department = add_department('code', 'name')
+        user_profile = add_user('username', 'password', 'first_name', 'last_name', 'email', department, date(2015, 5, 31))
+        
+        add_time_entry(project_a, user_profile, date(2015, 5, 1), 7)
+        add_time_entry(project_a, user_profile, date(2015, 5, 3), 8)
+        
+        response = self.client.post(reverse('report'), {'from_date': '2015-5-1', 'to_date': '2015-5-3'})
+        self.assertEqual(response.status_code, 200)
+        
+        expected_projects = [project_a]
+        expected_data = [
+                            {'username': u'__test_user', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'late_submission': True, 'project_hours': ['']},
+                            {'username': u'username', 'department': department.code, 'submitted_until': date(2015, 5, 31), 'late_submission': False, 'project_hours': [15]}]
+        
+        self.assert_projects(response.context['projects'], expected_projects)
+        self.assertEqual(response.context['data'], expected_data)
+        
+    def test_incorrect_from_date(self):
+        response = self.client.post(reverse('report'), {'from_date': '2015-2-29', 'to_date': '2015-5-3'})
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, 'filter_form', 'from_date', 'Enter a valid date.')
+        
+    def test_incorrect_to_date(self):
+        response = self.client.post(reverse('report'), {'from_date': '2015-2-28', 'to_date': '2015-5-32'})
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, 'filter_form', 'to_date', 'Enter a valid date.')

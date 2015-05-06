@@ -6,40 +6,35 @@ from django.db.models import Prefetch, Sum, F, Count
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from app.models import Project, TimeEntry, UserProfile
+from app.forms import ReportFilterForm
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def report(request):
-    projects = Project.objects.order_by('code')
-    
-    now = datetime.datetime.now()
-    this_month_day_count = calendar.monthrange(now.year, now.month)[1]
-    base_date = datetime.datetime.now() - timedelta(days=this_month_day_count)
-    base_date = base_date.replace(day=1) #there is always a first in every month
-    if 'month' in request.GET:
-        base_date = base_date.replace(month=int(request.GET['month']))
-    if 'year' in request.GET:
-        base_date = base_date.replace(year=int(request.GET['year']))
-    
-    if base_date.month == 12:
-        next_year = base_date.year + 1
-        next_month = 1
-        previous_year = base_date.year
-        previous_month = base_date.month - 1
-    elif base_date.month == 1:
-        next_year = base_date.year
-        next_month = base_date.month + 1
-        previous_year = base_date.year - 1
-        previous_month = 12
-    else:
-        next_year = base_date.year
-        next_month = base_date.month + 1
-        previous_year = base_date.year
-        previous_month = base_date.month - 1
+    if (request.method == 'GET'):
+        now = datetime.datetime.now().date()
+        this_month_day_count = calendar.monthrange(now.year, now.month)[1]
+        base_date = now - timedelta(days=this_month_day_count)
+        base_date = base_date.replace(day=1) #there is always a first in every month
+                
+        start_date = base_date.replace(day=1)
+        end_day = calendar.monthrange(base_date.year, base_date.month)[1]
+        end_date = base_date.replace(day=end_day)
         
-    start_date = base_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    end_day = calendar.monthrange(base_date.year, base_date.month)[1]
-    end_date = base_date.replace(day=end_day, hour=23, minute=59, second=59, microsecond=999999)
+        filter_form = ReportFilterForm(initial={'from_date': start_date, 'to_date': end_date})
+    else:
+        filter_form = ReportFilterForm(request.POST)
+        if(filter_form.is_valid()):
+            data = filter_form.cleaned_data
+            start_date = data['from_date']
+            end_date= data['to_date']
+        else:
+            return render(request, 'app/report.html', {'data': [], 'filter_form': filter_form})
+        
+    return report_response(request, filter_form, start_date, end_date)
+    
+def report_response(request, filter_form, start_date, end_date):
+    projects = Project.objects.order_by('code')
     
     user_data = TimeEntry.objects.filter(userprofile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
     user_data = user_data.values('project__name', 'project__code', 'userprofile__user__username', 'userprofile__department__code', 'userprofile__submitted_until')
@@ -50,9 +45,7 @@ def report(request):
                             .order_by('userprofile__department__code', 'username'))
     
     context_dict = {'data': [], 'projects': projects,
-        'year': base_date.year, 'month': base_date.month,
-        'query_for_previous': '?year={0}&month={1}'.format(previous_year, previous_month),
-        'query_for_next': '?year={0}&month={1}'.format(next_year, next_month)}
+        'filter_form': filter_form}
     
     current_user = ''
     user_project_hours = []
@@ -73,7 +66,7 @@ def report(request):
                                          'username': users_with_no_data[0]['username'],
                                          'department': users_with_no_data[0]['userprofile__department__code'],
                                          'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
-                                         'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date.date(),
+                                         'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date,
                                          'project_hours': ['' for i in range(len(projects))]})
                     users_with_no_data.pop(0)
                     if(len(users_with_no_data) == 0):
@@ -82,7 +75,7 @@ def report(request):
             context_dict['data'].append({'username': data_entry['userprofile__user__username'], 
                                          'department': data_entry['userprofile__department__code'],
                                          'submitted_until': data_entry['userprofile__submitted_until'], 
-                                         'late_submission': data_entry['userprofile__submitted_until'] < end_date.date(),
+                                         'late_submission': data_entry['userprofile__submitted_until'] < end_date,
                                          'project_hours': user_project_hours})
             
         for project in projects:
@@ -100,7 +93,7 @@ def report(request):
         context_dict['data'].append({'username': users_with_no_data[0]['username'],
                              'department': users_with_no_data[0]['userprofile__department__code'],
                              'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
-                             'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date.date(),
+                             'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date,
                              'project_hours': ['' for i in range(len(projects))]})
         users_with_no_data.pop(0)
     

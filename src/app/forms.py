@@ -14,3 +14,7 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('department',)
+        
+class ReportFilterForm(forms.Form):
+    from_date = forms.DateField(label='From date')
+    to_date = forms.DateField(label='To date')
