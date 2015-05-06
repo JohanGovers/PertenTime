@@ -65,20 +65,23 @@ function RegistrationVm() {
 		self.showErrorMessage(true);
 	};
 	
-	self.startDate = undefined;
-	self.endDate = undefined;
-	self.submittedUntil = undefined;
+	self.startDate = ko.observable();
+	self.endDate = ko.observable();
+	self.submittedUntil = ko.observable();
 	self.projects = ko.observableArray();
 	
 	self.allSubmitted = ko.observable(false);
 	
+	self.disableSubmitButton = ko.computed(function(){
+		return self.dataLoadingInProgress() || self.endDate() <= self.submittedUntil();
+	});
 	
 	self.loadData = function(){
 		if(!self.dataLoadingInProgress()) {
 			self.dataLoadingInProgress(true);
 			var requestData = {};
-			if (!!self.startDate) {
-				requestData = { startDate: self.startDate.format("YYYY-MM-DD") }
+			if (!!self.startDate()) {
+				requestData = { startDate: self.startDate().format("YYYY-MM-DD") }
 			}
 			
 			$.ajax({
@@ -88,10 +91,10 @@ function RegistrationVm() {
 			})
 			.done(function(data){
 				self.projects.removeAll();
-				self.submittedUntil = moment(data.submittedUntil);
-				self.startDate = moment(data.startDate);
-				self.endDate = moment(data.endDate);
-				self.allSubmitted(self.endDate <= self.submittedUntil);
+				self.submittedUntil(moment(data.submittedUntil));
+				self.startDate(moment(data.startDate));
+				self.endDate(moment(data.endDate));
+				self.allSubmitted(self.endDate() <= self.submittedUntil());
 				for (var i = 0; i < data.projects.length; i++) {
 					self.projects.push(new Project(data.projects[i].id, data.projects[i].code, data.projects[i].name, data.projects[i].timeentries, self));
 				}
@@ -108,29 +111,29 @@ function RegistrationVm() {
 		if (!self.allSubmitted()) {
 			return;
 		}
-		self.startDate = self.startDate.add(7, 'days');
-		self.endDate = self.endDate.add(7, 'days');
+		self.startDate(self.startDate().add(7, 'days'));
+		self.endDate(self.endDate().add(7, 'days'));
 		
 		self.loadData();
 	}
 	
 	self.loadPreviousWeek = function () {
-		self.startDate = self.startDate.subtract(7, 'days');
-		self.endDate = self.endDate.subtract(7, 'days');
+		self.startDate(self.startDate().subtract(7, 'days'));
+		self.endDate(self.endDate().subtract(7, 'days'));
 		
 		self.loadData();
 	}
 	
 	self.submitUntilCurrentWeek = function () {
 		var submitEndDate;
-		if (self.startDate.month() != self.endDate.month()) {
-			if (self.submittedUntil.isBetween(self.startDate, self.endDate, 'day')) {
-				submitEndDate = self.endDate.format("YYYY-MM-DD");
+		if (self.startDate().month() != self.endDate().month()) {
+			if (self.submittedUntil().isBetween(self.startDate(), self.endDate(), 'day')) {
+				submitEndDate = self.endDate().format("YYYY-MM-DD");
 			} else {
-				submitEndDate = self.startDate.endOf('month').format("YYYY-MM-DD");
+				submitEndDate = self.startDate().endOf('month').format("YYYY-MM-DD");
 			}
 		} else {
-			submitEndDate = self.endDate.format("YYYY-MM-DD");
+			submitEndDate = self.endDate().format("YYYY-MM-DD");
 		}
 		$.ajax({
 			type: 'POST',
@@ -138,7 +141,7 @@ function RegistrationVm() {
 			data: { date: submitEndDate },
 			})
 			.done(function(data){
-				self.startDate = null;
+				self.startDate(null);
 				self.loadData();
 			})
 			.fail(function(req, status, error){
