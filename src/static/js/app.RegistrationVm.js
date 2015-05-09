@@ -125,20 +125,10 @@ function RegistrationVm() {
 	}
 	
 	self.submitUntilCurrentWeek = function () {
-		var submitEndDate;
-		if (self.startDate().month() != self.endDate().month()) {
-			if (self.submittedUntil().isBetween(self.startDate(), self.endDate(), 'day')) {
-				submitEndDate = self.endDate().format("YYYY-MM-DD");
-			} else {
-				submitEndDate = self.startDate().endOf('month').format("YYYY-MM-DD");
-			}
-		} else {
-			submitEndDate = self.endDate().format("YYYY-MM-DD");
-		}
 		$.ajax({
 			type: 'POST',
 			url: 'set_last_submitted',
-			data: { date: submitEndDate },
+			data: { date: self.endDate().format("YYYY-MM-DD") },
 			})
 			.done(function(data){
 				self.startDate(null);

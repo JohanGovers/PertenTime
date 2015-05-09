@@ -2,43 +2,47 @@
 {% load static %}
 {% block body_block %}
     <body>
-        <h1>Report for {{year}}-{{month}}</h1>
-	<p>
-		<ul class="button-bar">
-			<li><a href="{{ query_for_previous }}" class="small"><i class="fa fa-angle-double-left"></i> Previous month</a></li>
-			<li><a href="{{ query_for_next }}" class="small">Next month <i class="fa fa-angle-double-right"></i></a></li>
-			<li><a href="javascript:tableToExcel('report')" class="small"><i class="fa fa-file-excel-o"></i> Download as excel sheet</a></li>
-		</ul>
-	</p>
-        <table id="report">
-        	<thead>
-		    <tr>
-			    <th>User</th>
-			    <th>Department</th>
-			    <th>Submitted until</th>
-			    {% for project in projects %}
-			    <th>{{ project }}</th>
-			    {% endfor %}
-		    </tr>
-        	</thead>
-        	<tbody>
-		    {% for row in data %}
-		    {% if row.late_submission %}
-		    <tr style="background-color: red">
-		    {% else %}
-		    <tr>
-		    {% endif %}
-			    <td>{{ row.username }}</td>
-			    <td>{{ row.department }}</td>
-			    <td>{{ row.submitted_until }}</td>
-			    {% for hours in row.project_hours %}
-			    <td>{{ hours }}</td>
-			    {% endfor %}
-		    </tr>
-		    {% endfor %}
-        	<tbody>
-        </table>
-        <img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
+        <h1>Report for {{filter_form.from_date.value}}-{{filter_form.to_date.value}}</h1>
+		<form id="filter_form" method="post" action="/report/"
+				enctype="multipart/form-data">
+	
+			{% csrf_token %}
+	
+			{{ filter_form.as_p }}
+	
+			<input type="submit" name="submit" value="Generate report" />
+		</form>
+		<hr>
+		<button click="javascript:tableToExcel('report')" class="button"><i class="fa fa-file-excel-o"></i> Download as excel sheet (TEST)</button>
+		<table id="report">
+			<thead>
+			<tr>
+				<th>User</th>
+				<th>Department</th>
+				<th>Submitted until</th>
+				{% for project in projects %}
+				<th>{{ project }}</th>
+				{% endfor %}
+			</tr>
+			</thead>
+			<tbody>
+			{% for row in data %}
+			{% if row.late_submission %}
+			<tr style="background-color: red">
+			{% else %}
+			<tr>
+			{% endif %}
+				<td>{{ row.username }}</td>
+				<td>{{ row.department }}</td>
+				<td>{{ row.submitted_until }}</td>
+				{% for hours in row.project_hours %}
+				<td>{{ hours }}</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+			<tbody>
+		</table>
+		<img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
     </body>
 {% endblock %}
 {% block scriptblock %}

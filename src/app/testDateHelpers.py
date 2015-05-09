@@ -36,3 +36,14 @@ class DateHelperTests(TestCase):
                     get_last_date_of_previous_month(date(2015,3,30)), 
                                                     date(2015,2,28))        
     
+    def test_string_2015_05_03_to_date(self):
+        """
+        Parse date string happy case 2015-05-03.
+        """
+        self.assertEquals(string_to_date("2015-05-03"), date(2015,5,3))
+        
+    def test_string_to_date_without_leading_zeroes(self):
+        """
+        Parse date string 2015-5-3 without leading zeroes.
+        """
+        self.assertEquals(string_to_date("2015-5-3"), date(2015,5,3))
