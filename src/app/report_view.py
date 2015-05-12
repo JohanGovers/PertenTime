@@ -37,11 +37,11 @@ def report_response(request, filter_form, start_date, end_date):
     projects = Project.objects.order_by('code')
     
     user_data = TimeEntry.objects.filter(userprofile__submitted_until__gte=F('date'), date__gte=start_date, date__lte=end_date)
-    user_data = user_data.values('project__name', 'project__code', 'userprofile__user__username', 'userprofile__department__code', 'userprofile__submitted_until')
+    user_data = user_data.values('project__name', 'project__code', 'userprofile__user__username', 'userprofile__department__code', 'userprofile__submitted_until', 'userprofile__user__first_name', 'userprofile__user__last_name')
     user_data = user_data.annotate(total_hours=Sum('hours')).order_by('userprofile__department__code', 'userprofile__user__username', 'project__code')
 
     users_with_no_data = list(User.objects.exclude(username__in=user_data.values('userprofile__user__username'))
-                            .values('username', 'userprofile__submitted_until', 'userprofile__department__code')
+                            .values('username', 'userprofile__submitted_until', 'userprofile__department__code', 'first_name', 'last_name')
                             .order_by('userprofile__department__code', 'username'))
     
     context_dict = {'data': [], 'projects': projects,
@@ -63,7 +63,7 @@ def report_response(request, filter_form, start_date, end_date):
             if len(users_with_no_data) > 0:
                 while users_with_no_data[0]['userprofile__department__code'] < data_entry['userprofile__department__code'] or users_with_no_data[0]['userprofile__department__code'] == data_entry['userprofile__department__code'] and users_with_no_data[0]['username'] < current_user:
                     context_dict['data'].append({
-                                         'username': users_with_no_data[0]['username'],
+                                         'name': users_with_no_data[0]['first_name'] + ' ' + users_with_no_data[0]['last_name'],
                                          'department': users_with_no_data[0]['userprofile__department__code'],
                                          'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
                                          'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date,
@@ -72,7 +72,7 @@ def report_response(request, filter_form, start_date, end_date):
                     if(len(users_with_no_data) == 0):
                         break
             
-            context_dict['data'].append({'username': data_entry['userprofile__user__username'], 
+            context_dict['data'].append({'name': data_entry['userprofile__user__first_name'] + ' ' + data_entry['userprofile__user__last_name'], 
                                          'department': data_entry['userprofile__department__code'],
                                          'submitted_until': data_entry['userprofile__submitted_until'], 
                                          'late_submission': data_entry['userprofile__submitted_until'] < end_date,
@@ -90,7 +90,7 @@ def report_response(request, filter_form, start_date, end_date):
                     user_project_hours.append('')        
     
     while len(users_with_no_data) > 0:
-        context_dict['data'].append({'username': users_with_no_data[0]['username'],
+        context_dict['data'].append({'name': users_with_no_data[0]['first_name'] + ' ' + users_with_no_data[0]['last_name'],
                              'department': users_with_no_data[0]['userprofile__department__code'],
                              'submitted_until': users_with_no_data[0]['userprofile__submitted_until'], 
                              'late_submission': users_with_no_data[0]['userprofile__submitted_until'] < end_date,
