@@ -97,4 +97,6 @@ def report_response(request, filter_form, start_date, end_date):
                              'project_hours': ['' for i in range(len(projects))]})
         users_with_no_data.pop(0)
     
+    context_dict['data'].sort(key=lambda item: (item['department'], item['name']))
+    
     return render(request, 'app/report.html', context_dict)

@@ -272,9 +272,10 @@ class ReportViewTests(TestCase):
         expected_projects = [project_a, project_b]
         expected_data = [
             {'name': ' ', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'late_submission': True, 'project_hours': ['', '']},
+            {'name': 'first_name1 last_name', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': [7, '']},
             {'name': 'first_name2 last_name', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '']},
             {'name': 'first_name3 last_name', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '']},
-            {'name': 'first_name1 last_name', 'department': department.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': [7, '']}]
+        ]
         
         self.assert_projects(response.context['projects'], expected_projects)
         
@@ -292,7 +293,7 @@ class ReportViewTests(TestCase):
         user_profile_1 = add_user('username1', 'password', 'first_name1', 'last_name', 'email', department2, date(2015, 5, 18))
         user_profile_2 = add_user('username2', 'password', 'first_name2', 'last_name', 'email', department3, date(2015, 5, 18))
         user_profile_3 = add_user('username3', 'password', 'first_name3', 'last_name', 'email', department1, date(2015, 5, 18))
-        user_profile_4 = add_user('username4', 'password', 'first_name4', 'last_name', 'email', department1, date(2015, 5, 18))
+        user_profile_4 = add_user('username4', 'password', 'a first_name4', 'last_name', 'email', department1, date(2015, 5, 18))
         user_profile_5 = add_user('user5', 'password', 'first_name5', 'last_name', 'email', department2, date(2015, 5, 18))
         
         add_time_entry(project_a, user_profile_1, date(2015, 2, 12), 6)
@@ -304,10 +305,10 @@ class ReportViewTests(TestCase):
         
         expected_projects = [project_a, project_b, project_c]
         expected_data = [
+            {'name': 'a first_name4 last_name', 'department': department1.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '', '']},
             {'name': 'first_name3 last_name', 'department': department1.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '', 8]},
-            {'name': 'first_name4 last_name', 'department': department1.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '', '']},
-            {'name': 'first_name5 last_name', 'department': department2.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '', '']},
             {'name': 'first_name1 last_name', 'department': department2.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': [6, '', '']},
+            {'name': 'first_name5 last_name', 'department': department2.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', '', '']},
             {'name': 'first_name2 last_name', 'department': department3.code, 'submitted_until': date(2015, 5, 18), 'late_submission': False, 'project_hours': ['', 7, '']},
             {'name': ' ', 'department': '_T', 'submitted_until': date(2012, 1, 11), 'late_submission': True, 'project_hours': ['', '', '']},
             ]
