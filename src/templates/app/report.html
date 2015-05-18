@@ -13,7 +13,7 @@
 			<input type="submit" name="submit" value="Generate report" />
 		</form>
 		<hr>
-		<button click="javascript:tableToExcel('report')" class="button"><i class="fa fa-file-excel-o"></i> Download as excel sheet (TEST)</button>
+		<button onclick="tableToExcel('report', 'Perten Time report')" class="button"><i class="fa fa-file-excel-o"></i> Download as excel sheet</button>
 		<table id="report">
 			<thead>
 			<tr>
@@ -45,7 +45,7 @@
 		<img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
     </body>
 {% endblock %}
-{% block scriptblock %}
+{% block script_block %}
     <script>
 	// Inspired by: http://stackoverflow.com/questions/6955627/export-dynamic-html-table-to-excel-in-javascript-in-firefox-browser
 	var tableToExcel = (function() {
