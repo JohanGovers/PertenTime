@@ -54,6 +54,9 @@
 	    var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
 	    var format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
 	    return function(table, name) {
+		if (!window.chrome) {
+			alert("Hi there. It seems like you are not using Chrome as your browser. This feature has been tested and proven in Chrome but may still work in other browsers. If it does not, please try it in Chrome.");
+		}
 		if (!table.nodeType) table = document.getElementById(table)
 		var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
 		window.location.href = uri + base64(format(template, ctx))
