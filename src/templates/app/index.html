@@ -13,15 +13,35 @@
 	    .no-border th{
 		border: 0px;
 	    }
+		
+		.contain-floats{
+			margin: 10px;
+			overflow: hidden; /* To make the float size to content */
+		}
+		
+		.pull-right{
+			float: right;
+		}
+		
+		.pull-left{
+			float: left;
+		}
 	</style>
-	<h1>Project time report</h1>
-	<p>Hello {{ user.username }} <a href="/logout">Logout</a></p>
-	<p>
-		<ul class="button-bar">
+	<div class="contain-floats">
+		<h1 class="pull-left">Project time report</h1>
+		<p class="pull-right">Hello {{ user.username }} <a href="/logout">Logout</a></p>
+		<img id="loading" class="pull-right" style="display: none; margin-right: 10px;" src="{% static "images/loader.gif" %}">
+	</div>
+	<p style="color: red" data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
+	the page to solve the problem. If that doesn't help <a href="mailto:johan.govers@gmail.com">let us know</a>.</p>		
+	<div class="contain-floats">
+		<ul class="button-bar pull-left">
 			<li><a class="week-nav" data-bind="click: loadPreviousWeek, disable: dataLoadingInProgress"><i class="fa fa-angle-double-left"></i> Previous week</a></li>
 			<li><a class="week-nav" type="button" data-bind="click: loadNextWeek, css: {disabled: !allSubmitted() || dataLoadingInProgress()}">Next week <i class="fa fa-angle-double-right"></i></a></li>
-		</ul>		
-	</p>
+		</ul>
+		
+		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
+	</div>
 	<table>
 		<thead>
 			<tr class="no-border">
@@ -52,10 +72,9 @@
 			</tr>
 		<tbody>
 	</table>
-	<p><button class="orange" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button></p>
-	<img id="loading" style="display: none;" src="{% static "images/loader.gif" %}">
-	<p style="color: red" data-bind="visible: showErrorMessage">Ooops! Sorry. Something went wrong while communicating with the server. Please try to <a href="/">refresh</a>
-	the page to solve the problem. If that doesn't help <a href="mailto:johan.govers@gmail.com">let us know</a>.</p>
+	<div class="contain-floats">
+		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
+	</div>
 {% endblock %}
 {% block script_block %}
 	<script src="{% static "js/moment.js" %}"></script>
