@@ -26,6 +26,10 @@
 		.pull-left{
 			float: left;
 		}
+		
+		.text-muted {
+			color: #777;
+		}
 	</style>
 	<div class="contain-floats">
 		<h1 class="pull-left">Project time report</h1>
@@ -41,6 +45,7 @@
 		</ul>
 		
 		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
+		<span class="pull-right text-muted" style="line-height: 36px; padding: 0px 12px" data-bind="text: savedAt"></span>
 	</div>
 	<table>
 		<thead>

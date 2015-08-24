@@ -34,9 +34,9 @@ function TimeEntry(projectId, date, hours, submitted, vm) {
 			url: 'save_time_entry',
 			data: { projectId: self.projectId, date: self.date, hours: self.hours() },
 			})
-			//.done(function(data){
-			//	console.log(data);
-			//})
+			.done(function(data){
+				vm.savedAt("Saved at: " + new Date().toLocaleTimeString());
+			})
 			.fail(function(req, status, error){
 				vm.logError(status, error);
 		});
@@ -58,6 +58,7 @@ function Project(id, code, name, timeentries, vm) {
 function RegistrationVm() {
 	var self = this;
 	
+	self.savedAt = ko.observable();
 	self.dataLoadingInProgress = ko.observable(false);
 	self.showErrorMessage = ko.observable(false);
 	self.logError = function(status, error){
