@@ -35,7 +35,7 @@ function TimeEntry(projectId, date, hours, submitted, vm) {
 			data: { projectId: self.projectId, date: self.date, hours: self.hours() },
 			})
 			.done(function(data){
-				vm.savedAt("Saved at: " + new Date().toLocaleTimeString());
+				vm.savedAt("Saved at " + new Date().toLocaleTimeString());
 			})
 			.fail(function(req, status, error){
 				vm.logError(status, error);
