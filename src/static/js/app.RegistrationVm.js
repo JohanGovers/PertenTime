@@ -1,8 +1,11 @@
+"use strict";
+
 function TimeEntry(projectId, date, hours, submitted, vm) {
 	var self = this;
 	
 	self.projectId = projectId;
 	self.date = date;
+	self.hasError = ko.observable(false);
 	self.hours = ko.observable(hours).extend({ rateLimit: { timeout: 400, method: "notifyWhenChangesStop" } });
 	self.submitted = ko.observable(submitted);
 	
@@ -35,9 +38,11 @@ function TimeEntry(projectId, date, hours, submitted, vm) {
 			data: { projectId: self.projectId, date: self.date, hours: self.hours() },
 			})
 			.done(function(data){
+				self.hasError(false);
 				vm.savedAt("Saved at " + new Date().toLocaleTimeString());
 			})
 			.fail(function(req, status, error){
+				self.hasError(true);
 				vm.logError(status, error);
 		});
 	});

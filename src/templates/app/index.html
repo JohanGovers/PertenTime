@@ -30,6 +30,10 @@
 		.text-muted {
 			color: #777;
 		}
+		
+		.error {
+			background-color: #FFC1CC;
+		}
 	</style>
 	<div class="contain-floats">
 		<h1 class="pull-left">Project time report</h1>
@@ -72,7 +76,7 @@
 			<tr>
 				<td data-bind="text: code + ' - ' + name"></td>
 				<!-- ko foreach: $data.timeentries -->
-				<td><input style="padding: 5px;" class="col_10 right" data-bind="value: hours, valueUpdate: 'keyup', disable: submitted() || $root.dataLoadingInProgress()"></td>
+				<td><input style="padding: 5px;" class="col_10 right" data-bind="value: hours, valueUpdate: 'keyup', css: {error: hasError()}, disable: submitted() || $root.dataLoadingInProgress()"></td>
 				<!-- /ko -->
 			</tr>
 		<tbody>
