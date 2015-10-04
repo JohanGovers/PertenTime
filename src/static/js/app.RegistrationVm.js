@@ -78,6 +78,21 @@ function RegistrationVm() {
 	
 	self.allSubmitted = ko.observable(false);
 	
+	self.totalHours = ko.computed(function(){
+		var sum = 0;
+		var projects = self.projects();
+		for(var i = 0; i < projects.length; i++){
+			var timeentries = projects[i].timeentries();
+			for (var j = 0; j < timeentries.length; j++) {
+				var val = parseInt(timeentries[j].hours());
+				if (isFinite(val)) {
+					sum += val;
+				}
+			}
+		}
+		
+		return sum;
+	});
 	self.disableSubmitButton = ko.computed(function(){
 		return self.dataLoadingInProgress() || self.endDate() <= self.submittedUntil();
 	});

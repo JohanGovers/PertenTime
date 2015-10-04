@@ -34,6 +34,11 @@
 		.error {
 			background-color: #FFC1CC;
 		}
+		
+		.toolbar-text {
+			line-height: 36px;
+			padding: 0px 12px
+		}
 	</style>
 	<div class="contain-floats">
 		<h1 class="pull-left">Project time report</h1>
@@ -49,7 +54,12 @@
 		</ul>
 		
 		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
-		<span class="pull-right text-muted" style="line-height: 36px; padding: 0px 12px" data-bind="text: savedAt"></span>
+		
+		<div class="pull-right toolbar-text">
+			<span data-bind="text: totalHours"></span><span> hours total</span>
+		</div>
+		
+		<span class="pull-right text-muted toolbar-text" data-bind="text: savedAt"></span>
 	</div>
 	<table>
 		<thead>
