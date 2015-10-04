@@ -27,7 +27,7 @@ pip install -r requirements.txt
 If you don't want to use virtualenv you must still install the required packages (the last row of the commands above). To enter a virtualenv use ```workon [envname]``` and to exit a virtualenv use ```deactivate```.
 
 ### Django setup
-PertenTime currently uses sqlite as its database. The database will show up as a file named PertenTime.sqlite3 in the src directory when created. To dump the database simply remove the file.
+PertenTime currently uses sqlite as its database. The database will show up as a file named PertenTime.sqlite3 in the src directory when created. To delete the database simply remove the file.
 
 To create the database change directory to the src folder and run the django migrate command by issuesing the following
 
