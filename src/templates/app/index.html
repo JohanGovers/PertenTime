@@ -35,7 +35,7 @@
 			background-color: #FFC1CC;
 		}
 		
-		.toolbar-text {
+		.toolbar-label {
 			line-height: 36px;
 			padding: 0px 12px
 		}
@@ -55,11 +55,11 @@
 		
 		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
 		
-		<div class="pull-right toolbar-text">
+		<div class="pull-right toolbar-label">
 			<span data-bind="text: totalHours"></span><span> hours total</span>
 		</div>
 		
-		<span class="pull-right text-muted toolbar-text" data-bind="text: savedAt"></span>
+		<span class="pull-right text-muted toolbar-label" data-bind="text: savedAt"></span>
 	</div>
 	<table>
 		<thead>
