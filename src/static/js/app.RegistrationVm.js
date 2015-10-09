@@ -157,6 +157,17 @@ function RegistrationVm() {
 			})
 			.fail(function(req, status, error){
 				self.logError(status, error);
+			})
+			.always(function(){
+				self.hideConfirmSubmitDialog();
 			});
+	}
+	
+	self.showConfirmSubmitDialog = function (){
+		$("#confirmDialog").fadeIn();
+	}
+	
+	self.hideConfirmSubmitDialog = function (){
+		$("#confirmDialog").fadeOut();
 	}
 }

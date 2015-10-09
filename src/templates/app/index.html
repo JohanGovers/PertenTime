@@ -1,6 +1,7 @@
 {% extends 'app/base.html' %}
 {% load static %}
-{% block body_block %}
+{% block style_block %}
+
 	<style>
 	    .week-nav{
 		cursor: hand; cursor: pointer;
@@ -39,7 +40,56 @@
 			line-height: 36px;
 			padding: 0px 12px
 		}
+		
+		#confirmDialogBackdrop{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			z-index: 100;
+			
+			background-color: rgba(0,0,0,0.3);
+			
+			display: flex;
+			justify-content: center
+		}
+		
+		#confirmDialogContent {
+			position: relative;
+			top:0;
+			left:0;
+			bottom:0;
+			right: 0;
+			z-index: 110;
+			width: 200px;
+			height: 200px;
+			margin: 0 auto;
+			
+			align-self: center;
+			text-align: center;
+			width: 400px;
+			background-color: white;
+			padding: 10px;
+			border: 1px solid grey;
+			border-radius: 8px;
+		}
+		
+		#confirmDialog button {
+			margin: 5px 20px;
+		}
 	</style>
+{% endblock %}
+{% block body_block %}
+	<div id="confirmDialog" class="hide">
+		<div id="confirmDialogBackdrop">
+			<div id="confirmDialogContent">
+				<h4>Confirm submission</h4>
+				<p>Submitting will lock this week from future editing.</p>
+				<p>Are you sure you want to submit this week?</p>
+				<button class="orange" data-bind="click: submitUntilCurrentWeek">Yes</button>
+				<button data-bind="click: hideConfirmSubmitDialog">No</button>
+			</div>
+		</div>
+	</div>
 	<div class="contain-floats">
 		<h1 class="pull-left">Project time report</h1>
 		<p class="pull-right">Hello {{ user.username }} <a href="/logout">Logout</a></p>
@@ -53,7 +103,7 @@
 			<li><a class="week-nav" type="button" data-bind="click: loadNextWeek, css: {disabled: !allSubmitted() || dataLoadingInProgress()}">Next week <i class="fa fa-angle-double-right"></i></a></li>
 		</ul>
 		
-		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
+		<button class="orange pull-right" type="button" data-bind="click: showConfirmSubmitDialog, disable: disableSubmitButton">Submit</button>
 		
 		<div class="pull-right toolbar-label">
 			<span data-bind="text: totalHours"></span><span> hours total</span>
@@ -92,7 +142,7 @@
 		<tbody>
 	</table>
 	<div class="contain-floats">
-		<button class="orange pull-right" type="button" data-bind="click: submitUntilCurrentWeek, disable: disableSubmitButton">Submit</button>
+		<button class="orange pull-right" type="button" data-bind="click: showConfirmSubmitDialog, disable: disableSubmitButton">Submit</button>
 	</div>
 {% endblock %}
 {% block script_block %}
