@@ -60,13 +60,12 @@
 			bottom:0;
 			right: 0;
 			z-index: 110;
-			width: 200px;
+			max-width: 620px;
 			height: 200px;
 			margin: 0 auto;
 			
 			align-self: center;
 			text-align: center;
-			width: 400px;
 			background-color: white;
 			padding: 10px;
 			border: 1px solid grey;
@@ -74,7 +73,7 @@
 		}
 		
 		#confirmDialog button {
-			margin: 5px 20px;
+			margin: 5px 10px;
 		}
 	</style>
 {% endblock %}
@@ -85,8 +84,9 @@
 				<h4>Confirm submission</h4>
 				<p>Submitting will lock this week from future editing.</p>
 				<p>Are you sure you want to submit this week?</p>
-				<button class="orange" data-bind="click: submitUntilCurrentWeek">Yes</button>
-				<button data-bind="click: hideConfirmSubmitDialog">No</button>
+				<button class="green" data-bind="click: submitUntilCurrentWeek">Yes I'm sure</button>
+				<button class="orange" data-bind="click: submitAndHideFutureWarnings">Yes I am and don't ask me again</button>
+				<button data-bind="click: hideConfirmSubmitDialog">No I'm not ready</button>
 			</div>
 		</div>
 	</div>

@@ -21,6 +21,7 @@ class UserProfile(models.Model):
     
     department = models.ForeignKey(Department)
     submitted_until = models.DateField()
+    skip_confirm_submit_dialog = models.BooleanField(default=False)
     
     def __str__(self):
         return self.user.username

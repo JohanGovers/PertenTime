@@ -111,6 +111,7 @@ function RegistrationVm() {
 				data: requestData,
 			})
 			.done(function(data){
+				self.skipConfirmSubmitDialog = data.skipConfirmSubmitDialog;
 				self.projects.removeAll();
 				self.submittedUntil(moment(data.submittedUntil));
 				self.startDate(moment(data.startDate));
@@ -146,10 +147,21 @@ function RegistrationVm() {
 	}
 	
 	self.submitUntilCurrentWeek = function () {
+		submitUntilCurrentWeek();
+	}
+	
+	function submitUntilCurrentWeek(options){
+		options = options || {};
+		options.skipFutureWarnings = options.skipFutureWarnings || false;
+		
+		console.log("submit with skip value", options.skipFutureWarnings);
 		$.ajax({
 			type: 'POST',
 			url: 'set_last_submitted',
-			data: { date: self.endDate().format("YYYY-MM-DD") },
+			data: {
+				date: self.endDate().format("YYYY-MM-DD"),
+				skipFutureWarnings: options.skipFutureWarnings
+			},
 			})
 			.done(function(data){
 				self.startDate(null);
@@ -163,8 +175,16 @@ function RegistrationVm() {
 			});
 	}
 	
+	self.submitAndHideFutureWarnings = function() {
+		submitUntilCurrentWeek({skipFutureWarnings: true});
+	}
+	
 	self.showConfirmSubmitDialog = function (){
-		$("#confirmDialog").fadeIn();
+		if (self.skipConfirmSubmitDialog) {
+			submitUntilCurrentWeek({skipFutureWarnings: true});
+		} else {
+			$("#confirmDialog").fadeIn();
+		}
 	}
 	
 	self.hideConfirmSubmitDialog = function (){

@@ -43,7 +43,8 @@ def get_time_entries(request):
         'projects': [],
         'submittedUntil': userprofile.submitted_until.strftime(date_parse_string),
         'startDate': start_date.strftime(date_parse_string),
-        'endDate': end_date.strftime(date_parse_string)}
+        'endDate': end_date.strftime(date_parse_string),
+        'skipConfirmSubmitDialog': userprofile.skip_confirm_submit_dialog}
     
     for project in projects:
         current_date = start_date
@@ -94,9 +95,11 @@ def save_time_entry(request):
 def set_last_submitted(request):
     if request.method == 'POST':
         new_date = request.POST.get('date')
+        skip_future_warnings = request.POST.get('skipFutureWarnings') == "true"
         
         userprofile = UserProfile.objects.get(user=request.user)
         userprofile.submitted_until = new_date
+        userprofile.skip_confirm_submit_dialog = skip_future_warnings
         userprofile.save()
         
         return HttpResponse('Last submetted set to ' + new_date)
