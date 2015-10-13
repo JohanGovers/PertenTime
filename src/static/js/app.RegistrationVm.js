@@ -84,7 +84,7 @@ function RegistrationVm() {
 		for(var i = 0; i < projects.length; i++){
 			var timeentries = projects[i].timeentries();
 			for (var j = 0; j < timeentries.length; j++) {
-				var val = parseInt(timeentries[j].hours());
+				var val = parseFloat(timeentries[j].hours());
 				if (isFinite(val)) {
 					sum += val;
 				}
