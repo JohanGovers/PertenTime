@@ -128,10 +128,6 @@ function RegistrationVm() {
 		return nonFavs;
 	});
 
-	self.showSplitter = ko.pureComputed(function(){
-		return self.favouriteProjects().length > 0 && self.nonFavouriteProjects().length > 0;
-	})
-
 	self.allSubmitted = ko.observable(false);
 
 	self.totalHours = ko.computed(function(){

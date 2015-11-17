@@ -156,16 +156,6 @@
 				<!-- /ko -->
 			</tr>
 		</tbody>
-		<tbody data-bind="if: showSplitter()">
-			<tr>
-				<td colspan="2"><hr></td>
-				<!-- ko if: projects()[0] -->
-				<!-- ko foreach: projects()[0].timeentries -->
-				<td><hr></td>
-				<!-- /ko -->
-				<!-- /ko -->
-			</tr>
-		<tbody>
 		<tbody data-bind="foreach: nonFavouriteProjects">
 			<tr>
 				<td data-bind="click: markAsFavourite"><i class="fa fa-star-o favourite-star"></i></td>
