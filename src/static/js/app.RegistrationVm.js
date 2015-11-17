@@ -54,7 +54,39 @@ function Project(id, code, name, favourite, timeentries, vm) {
 	self.id = id;
 	self.code = code;
 	self.name = name;
-	self.favourite = favourite;
+	self.favourite = ko.observable(favourite);
+
+	self.markAsFavourite = function(){
+		$.ajax({
+			type: 'POST',
+			url: 'mark_project_as_favourite',
+			data: {
+				projectId: self.id
+			},
+		})
+		.done(function(data){
+			self.favourite(true);
+		})
+		.fail(function(req, status, error){
+			self.logError(status, error);
+		});
+	}
+
+	self.removeFavouriteMark = function(){
+		$.ajax({
+			type: 'POST',
+			url: 'remove_project_as_favourite',
+			data: {
+				projectId: self.id
+			},
+		})
+		.done(function(data){
+			self.favourite(false);
+		})
+		.fail(function(req, status, error){
+			self.logError(status, error);
+		});
+	}
 
 	self.timeentries = ko.observableArray(timeentries.map(function(entry){
 		return new TimeEntry(id, entry.date, entry.hours, entry.submitted, vm);
@@ -79,7 +111,7 @@ function RegistrationVm() {
 	self.favouriteProjects = ko.pureComputed(function(){
 		var favs = [];
 		for (var i = 0; i < self.projects().length; i++){
-			if(self.projects()[i].favourite){
+			if(self.projects()[i].favourite()){
 				favs.push(self.projects()[i])
 			}
 		}
@@ -168,7 +200,6 @@ function RegistrationVm() {
 		options = options || {};
 		options.skipFutureWarnings = options.skipFutureWarnings || false;
 
-		console.log("submit with skip value", options.skipFutureWarnings);
 		$.ajax({
 			type: 'POST',
 			url: 'set_last_submitted',

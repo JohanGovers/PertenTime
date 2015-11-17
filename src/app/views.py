@@ -23,8 +23,8 @@ def about(request):
 @login_required
 def get_time_entries(request):
     userprofile = UserProfile.objects.prefetch_related('favourite_projects').get(user=request.user)
-    favourit_project_codes = [proj.code for proj in userprofile.favourite_projects.all()]
-    
+    favourit_project_ids = [proj.id for proj in userprofile.favourite_projects.all()]
+
     # TODO: Prefetch does not work here. It spams the db with queries.
     projects = Project.objects.order_by('code').prefetch_related(
                     Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date')
@@ -55,7 +55,7 @@ def get_time_entries(request):
         p = {'id': project.id,
              'code': project.code,
              'name': project.name,
-             'favourite': project.code in favourit_project_codes,
+             'favourite': project.id in favourit_project_ids,
              'timeentries': []}
 
         while current_date <= end_date:
@@ -108,6 +108,32 @@ def set_last_submitted(request):
         userprofile.save()
 
         return HttpResponse('Last submetted set to ' + new_date)
+    else:
+        return HttpResponse()
+
+@login_required
+def mark_project_as_favourite(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectId')
+
+        userprofile = UserProfile.objects.get(user=request.user)
+        userprofile.favourite_projects.add(Project.objects.get(pk=project_id))
+        userprofile.save()
+
+        return HttpResponse('Project marked as favourite.')
+    else:
+        return HttpResponse()
+
+@login_required
+def remove_project_as_favourite(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectId')
+
+        userprofile = UserProfile.objects.get(user=request.user)
+        userprofile.favourite_projects.remove(Project.objects.get(pk=project_id))
+        userprofile.save()
+
+        return HttpResponse('Project no longer marked as favourite.')
     else:
         return HttpResponse()
 
