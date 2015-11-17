@@ -147,7 +147,7 @@
 				<!-- /ko -->
 			</tr>
 		</thead>
-		<tbody data-bind="foreach: favouriteProjects">
+		<tbody data-bind="foreach: favouriteProjects()">
 			<tr>
 				<td data-bind="click: removeFavouriteMark"><i class="fa fa-star favourite-star"></i></td>
 				<td data-bind="text: code + ' - ' + name"></td>
@@ -156,7 +156,7 @@
 				<!-- /ko -->
 			</tr>
 		</tbody>
-		<tbody>
+		<tbody data-bind="if: showSplitter()">
 			<tr>
 				<td colspan="2"><hr></td>
 				<!-- ko if: projects()[0] -->
@@ -166,7 +166,7 @@
 				<!-- /ko -->
 			</tr>
 		<tbody>
-		<tbody data-bind="foreach: projects">
+		<tbody data-bind="foreach: nonFavouriteProjects">
 			<tr>
 				<td data-bind="click: markAsFavourite"><i class="fa fa-star-o favourite-star"></i></td>
 				<td data-bind="text: code + ' - ' + name"></td>

@@ -118,6 +118,19 @@ function RegistrationVm() {
 		return favs;
 	});
 
+	self.nonFavouriteProjects = ko.pureComputed(function(){
+		var nonFavs = [];
+		for (var i = 0; i < self.projects().length; i++){
+			if(!self.projects()[i].favourite()){
+				nonFavs.push(self.projects()[i])
+			}
+		}
+		return nonFavs;
+	});
+
+	self.showSplitter = ko.pureComputed(function(){
+		return self.favouriteProjects().length > 0 && self.nonFavouriteProjects().length > 0;
+	})
 
 	self.allSubmitted = ko.observable(false);
 
