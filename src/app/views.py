@@ -11,7 +11,7 @@ from app.forms import UserForm, UserProfileForm
 
 from app.date_helpers import *
 
-#TODO: Split into multiple files. 
+#TODO: Split into multiple files.
 
 @login_required
 def index(request):
@@ -22,12 +22,16 @@ def about(request):
 
 @login_required
 def get_time_entries(request):
-    userprofile = UserProfile.objects.get(user=request.user)
-    # TODO: Prefetch does not work here. It spams the db with queries. 
-    projects = Project.objects.order_by('code').prefetch_related(Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date').filter(userprofile=userprofile)))
+    userprofile = UserProfile.objects.prefetch_related('favourite_projects').get(user=request.user)
+    favourit_project_codes = [proj.code for proj in userprofile.favourite_projects.all()]
+    
+    # TODO: Prefetch does not work here. It spams the db with queries.
+    projects = Project.objects.order_by('code').prefetch_related(
+                    Prefetch('timeentry_set', queryset=TimeEntry.objects.order_by('date')
+                    .filter(userprofile=userprofile)))
 
     date_parse_string = "%Y-%m-%d"
-    if 'startDate' in request.GET:        
+    if 'startDate' in request.GET:
         start_date = datetime.datetime.strptime(request.GET['startDate'], date_parse_string).date()
     else:
         # sunday +1, monday +0, tuesday -1, wednesday -2, thursday -3, friday -4, saturday -5
@@ -36,32 +40,33 @@ def get_time_entries(request):
             start_date = userprofile.submitted_until + timedelta(days=1)
         else:
             start_date = userprofile.submitted_until - timedelta(days=weekday_nr - 1)
-            
+
     end_date = start_date + timedelta(days=6)
-    
+
     response_data = {
         'projects': [],
         'submittedUntil': userprofile.submitted_until.strftime(date_parse_string),
         'startDate': start_date.strftime(date_parse_string),
         'endDate': end_date.strftime(date_parse_string),
         'skipConfirmSubmitDialog': userprofile.skip_confirm_submit_dialog}
-    
+
     for project in projects:
         current_date = start_date
         p = {'id': project.id,
              'code': project.code,
              'name': project.name,
+             'favourite': project.code in favourit_project_codes,
              'timeentries': []}
-    
+
         while current_date <= end_date:
             # TODO: This is where the excess queries happen
             entry = project.timeentry_set.filter(date=current_date, userprofile=userprofile).first()
             p['timeentries'].append({'date': current_date.strftime('%Y-%m-%d'),
                                       'hours': str(entry.hours) if entry else None,
                                       'submitted': current_date <= userprofile.submitted_until})
-            
+
             current_date += datetime.timedelta(days=1)
-            
+
         response_data['projects'].append(p)
 
     return HttpResponse(
@@ -76,14 +81,14 @@ def save_time_entry(request):
         project = Project.objects.get(id=project_id)
         date = request.POST.get('date')
         hours = request.POST.get('hours')
-        
+
         entry, created = TimeEntry.objects.get_or_create(project=project, date=date, userprofile=userprofile)
         entry.hours = hours if hours != '' else 0
         entry.save()
-        
+
         response_data = {}
         response_data['msg'] = 'Added new entry with hours set to ' + str(hours) if created else 'Updated existing entry to ' + str(hours)
-        
+
         return HttpResponse(
             json.dumps(response_data),
             content_type="application/json"
@@ -91,21 +96,21 @@ def save_time_entry(request):
     else:
         return HttpResponse()
 
-@login_required        
+@login_required
 def set_last_submitted(request):
     if request.method == 'POST':
         new_date = request.POST.get('date')
         skip_future_warnings = request.POST.get('skipFutureWarnings') == "true"
-        
+
         userprofile = UserProfile.objects.get(user=request.user)
         userprofile.submitted_until = new_date
         userprofile.skip_confirm_submit_dialog = skip_future_warnings
         userprofile.save()
-        
+
         return HttpResponse('Last submetted set to ' + new_date)
     else:
         return HttpResponse()
-        
+
 def register(request):
     registered = False
 
@@ -138,7 +143,7 @@ def register(request):
     return render(request,
             'app/register.html',
             {'user_form': user_form, 'profile_form': profile_form, 'registered': registered} )
-    
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -158,7 +163,7 @@ def user_login(request):
 
     else:
         return render(request, 'app/login.html', {})
-    
+
 @login_required
 def user_logout(request):
     logout(request)

@@ -4,25 +4,26 @@ from django.contrib.auth.models import User
 class Project(models.Model):
     code = models.CharField(max_length=256, unique=True)
     name = models.CharField(max_length=256, unique=True)
-    
+
     def __str__(self):
         return self.code + " - " + self.name
 
 class Department(models.Model):
     code = models.CharField(max_length=256, blank=False)
-    
+
     name = models.CharField(max_length=256, blank=False)
-    
+
     def __str__(self):
         return self.code + " - " + self.name
-    
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
-    
+
     department = models.ForeignKey(Department)
     submitted_until = models.DateField()
     skip_confirm_submit_dialog = models.BooleanField(default=False)
-    
+    favourite_projects = models.ManyToManyField(Project)
+
     def __str__(self):
         return self.user.username
 
@@ -33,6 +34,6 @@ class TimeEntry(models.Model):
     hours = models.DecimalField(default=0, max_digits=4, decimal_places=2)
     project = models.ForeignKey(Project)
     userprofile = models.ForeignKey(UserProfile)
-    
+
     def __str__(self):
         return str(self.date) + ": " + str(self.hours) + " h"
