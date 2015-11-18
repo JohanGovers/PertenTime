@@ -5,15 +5,15 @@
         <h1>Report for {{filter_form.from_date.value}}-{{filter_form.to_date.value}}</h1>
 		<form id="filter_form" method="post" action="/report/"
 				enctype="multipart/form-data">
-	
+
 			{% csrf_token %}
-	
+
 			{{ filter_form.as_p }}
-	
+
 			<input type="submit" name="submit" value="Generate report" />
 		</form>
 		<hr>
-		<button onclick="tableToExcel('report', 'Perten Time report')" class="button"><i class="fa fa-file-excel-o"></i> Download as excel sheet</button>
+		<button onclick="tableToExcel('report', '{{filter_form.from_date.value}}-{{filter_form.to_date.value}}')" class="button"><i class="fa fa-file-excel-o"></i> Download as excel sheet</button>
 		<table id="report">
 			<thead>
 			<tr>
