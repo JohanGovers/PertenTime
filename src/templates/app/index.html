@@ -41,6 +41,22 @@
 			padding: 0px 12px
 		}
 
+		.highlight-weekend>td:nth-child(8){
+			background-color: #f8fbff;
+		}
+
+		.highlight-weekend>td:nth-child(9){
+			background-color: #f8fbff;
+		}
+
+		.highlight-weekend>th:nth-child(8){
+			color: #f93706;
+		}
+
+		.highlight-weekend>th:nth-child(9){
+			color: #f93706
+		}
+
 		.fa-star {
 			color: gold;
 		}
@@ -104,7 +120,7 @@
 		</div>
 	</div>
 	<div class="contain-floats">
-		<h1 class="pull-left">Project time report</h1>
+		<h3 class="pull-left">Project time report</h3>
 		<p class="pull-right">Hello {{ user.username }} <a href="/logout">Logout</a></p>
 		<img id="loading" class="pull-right" style="display: none; margin-right: 10px;" src="{% static "images/loader.gif" %}">
 	</div>
@@ -126,7 +142,7 @@
 	</div>
 	<table>
 		<thead>
-			<tr class="no-border">
+			<tr class="no-border highlight-weekend">
 				<th></th>
 				<th></th>
 				<th>Monday</th>
@@ -137,7 +153,7 @@
 				<th>Saturday</th>
 				<th>Sunday</th>
 			</tr>
-			<tr>
+			<tr class="highlight-weekend">
 				<th></th>
 				<th>Project</th>
 				<!-- ko if: projects()[0] -->
@@ -148,7 +164,7 @@
 			</tr>
 		</thead>
 		<tbody data-bind="foreach: favouriteProjects()">
-			<tr>
+			<tr class="highlight-weekend">
 				<td data-bind="click: removeFavouriteMark"><i class="fa fa-star favourite-star"></i></td>
 				<td data-bind="text: code + ' - ' + name"></td>
 				<!-- ko foreach: $data.timeentries -->
@@ -157,7 +173,7 @@
 			</tr>
 		</tbody>
 		<tbody data-bind="foreach: nonFavouriteProjects">
-			<tr>
+			<tr class="highlight-weekend">
 				<td data-bind="click: markAsFavourite"><i class="fa fa-star-o favourite-star"></i></td>
 				<td data-bind="text: code + ' - ' + name"></td>
 				<!-- ko foreach: $data.timeentries -->
