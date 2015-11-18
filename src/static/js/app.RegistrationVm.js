@@ -96,6 +96,7 @@ function Project(id, code, name, favourite, timeentries, vm) {
 function RegistrationVm() {
 	var self = this;
 
+	self.weekNr = ko.observable(moment().week());
 	self.savedAt = ko.observable();
 	self.dataLoadingInProgress = ko.observable(false);
 	self.showErrorMessage = ko.observable(false);
@@ -168,6 +169,7 @@ function RegistrationVm() {
 				self.submittedUntil(moment(data.submittedUntil));
 				self.startDate(moment(data.startDate));
 				self.endDate(moment(data.endDate));
+				self.weekNr(moment(data.startDate).week())
 				self.allSubmitted(self.endDate() <= self.submittedUntil());
 				for (var i = 0; i < data.projects.length; i++) {
 					self.projects.push(
