@@ -18,3 +18,5 @@ $(document).bind("ajaxSend", function(){
 	 }).bind("ajaxComplete", function(){
 	   $("#loading").hide();
 	 });
+
+moment.locale("sv");
